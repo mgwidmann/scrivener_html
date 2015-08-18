@@ -9,13 +9,3 @@ defmodule Scrivener.Support.HTML do
   def links_with_opts(paginator, opts \\ []), do: HTML.raw_pagination_links(Enum.into(%Scrivener.Page{}, paginator), Dict.merge([next: false, previous: false, first: false, last: false], opts))
 
 end
-# Must do this until Scrivener adds @derive Enumerable
-defimpl Enumerable, for: Scrivener.Page do
-  def reduce(pages, acc, fun), do: Enum.reduce(pages.entries || [], acc, fun)
-  def member?(pages, page), do: page in pages.entries
-  def count(pages), do: length(pages.entries)
-end
-defimpl Access, for: Scrivener.Page do
-  def get(pages, key), do: Map.get(pages, key)
-  def get_and_update(pages, key, fun), do: Map.get_and_update(pages, key, fun)
-end
