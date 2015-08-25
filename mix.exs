@@ -5,6 +5,9 @@ defmodule ScrivenerHtml.Mixfile do
     [app: :scrivener_html,
      version: "0.0.1",
      elixir: "~> 1.0.0",
+     name: "scrivener_html",
+     source_url: "git@github.com:mgwidmann/scrivener_html.git",
+     homepage_url: "https://github.com/mgwidmann/scrivener_html",
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -13,6 +16,7 @@ defmodule ScrivenerHtml.Mixfile do
        main: Scrivener.HTML,
        readme: "README.md"
      ],
+     package: package,
      deps: deps]
   end
 
@@ -42,7 +46,17 @@ defmodule ScrivenerHtml.Mixfile do
       {:scrivener, "~> 0.13.0"},
       {:phoenix_html, "~> 1.2.0"},
       {:phoenix, "~> 0.16.0", optional: true},
-      {:pavlov, "~> 0.2.3", only: :test}
+      {:pavlov, "~> 0.2.3", only: :test},
+      {:ex_doc, "~> 0.8", only: :dev},
+      {:earmark, "~> 0.1", only: :dev},
+    ]
+  end
+
+  defp package do
+    [
+      contributors: ["Matt Widmann"],
+      licenses: ["MIT"],
+      links: %{github: "https://github.com/mgwidmann/scrivener_html"}
     ]
   end
 end

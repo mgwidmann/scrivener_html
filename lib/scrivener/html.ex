@@ -1,6 +1,12 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
 
+  @moduledoc """
+  Primary helper to use is `Scrivener.HTML.pagination_links/4`.
+
+  For custom HTML output, see `Scrivener.HTML.raw_pagination_links/2`.
+  """
+
   defmodule Default do
     @doc """
     Default path function when none provided. Used when automatic path function
@@ -84,7 +90,7 @@ defmodule Scrivener.HTML do
   def pagination_links(%Scrivener.Page{} = paginator), do: pagination_links(nil, paginator, [], [])
   def pagination_links(%Scrivener.Page{} = paginator, opts), do: pagination_links(nil, paginator, [], opts)
   def pagination_links(conn, %Scrivener.Page{} = paginator), do: pagination_links(conn, paginator, [], [])
-  def pagination_links(conn, paginator, [{a, _} | _] = opts), do: pagination_links(conn, paginator, [], opts)
+  def pagination_links(conn, paginator, [{_, _} | _] = opts), do: pagination_links(conn, paginator, [], opts)
   def pagination_links(conn, paginator, [_ | _] = args), do: pagination_links(conn, paginator, args, [])
 
   defp find_path_fn(nil, _path_args), do: &Default.path/3
