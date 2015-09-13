@@ -5,7 +5,7 @@
   "meck": {:hex, :meck, "0.8.3"},
   "pavlov": {:hex, :pavlov, "0.2.3"},
   "phoenix": {:hex, :phoenix, "0.16.1"},
-  "phoenix_html": {:hex, :phoenix_html, "1.2.1"},
+  "phoenix_html": {:git, "git://github.com/phoenixframework/phoenix_html.git", "677ca1b35ec002275d2fbef259be85476e1672f6", []},
   "plug": {:hex, :plug, "1.0.0"},
   "poison": {:hex, :poison, "1.4.0"},
   "poolboy": {:hex, :poolboy, "1.5.1"},

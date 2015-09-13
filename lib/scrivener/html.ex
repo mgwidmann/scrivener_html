@@ -108,19 +108,21 @@ defmodule Scrivener.HTML do
 
   # Bootstrap implementation
   defp _pagination_links(paginator, [view_style: :bootstrap, path: path, args: args, params: params]) do
-    # Currently nesting content_tag's is broken...
-    links = raw_pagination_links(paginator)
-    |> Enum.map fn ({text, page_number})->
-      classes = []
-      if paginator[:page_number] == page_number do
-        classes = ["active"]
+    content_tag :nav do
+      content_tag :ul, class: "pagination" do
+        raw_pagination_links(paginator)
+        |> Enum.map fn ({text, page_number})->
+          classes = []
+          if paginator[:page_number] == page_number do
+            classes = ["active"]
+          end
+          params_with_page = Dict.merge(params, page: page_number)
+          content_tag :li do
+            link("#{text}", to: apply(path, args ++ [params_with_page]), class: Enum.join(classes, " "))
+          end
+        end
       end
-      params_with_page = Dict.merge(params, page: page_number)
-      l = link("#{text}", to: apply(path, args ++ [params_with_page]), class: Enum.join(classes, " "))
-      content_tag(:li, l)
     end
-    ul = content_tag(:ul, links, class: "pagination")
-    content_tag(:nav, ul)
   end
 
   defp _pagination_links(_paginator, [view_style: unknown, path: _path, args: _args, params: _params]) do
