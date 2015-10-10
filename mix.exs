@@ -54,7 +54,7 @@ defmodule ScrivenerHtml.Mixfile do
 
   defp package do
     [
-      contributors: ["Matt Widmann"],
+      maintainers: ["Matt Widmann"],
       licenses: ["MIT"],
       links: %{github: "https://github.com/mgwidmann/scrivener_html"}
     ]
