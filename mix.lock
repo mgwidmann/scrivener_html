@@ -1,7 +1,7 @@
 %{"decimal": {:hex, :decimal, "1.1.0"},
   "earmark": {:hex, :earmark, "0.1.17"},
   "ecto": {:hex, :ecto, "1.0.4"},
-  "ex_doc": {:hex, :ex_doc, "0.8.4"},
+  "ex_doc": {:hex, :ex_doc, "0.10.0"},
   "meck": {:hex, :meck, "0.8.3"},
   "pavlov": {:hex, :pavlov, "0.2.3"},
   "phoenix": {:hex, :phoenix, "1.0.3"},
