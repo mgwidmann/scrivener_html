@@ -77,7 +77,7 @@ defmodule Scrivener.HTML do
     merged_opts = Dict.merge @defaults,
               view_style: opts[:view_style] || Application.get_env(:scrivener_html, :view_style, :bootstrap)
 
-    path = opts[:path] || find_path_fn(paginator[:entries], args)
+    path = opts[:path] || find_path_fn(paginator.entries, args)
     params = Dict.drop opts, (Dict.keys(@defaults) ++ [:path])
 
     # Ensure ordering so pattern matching is reliable
@@ -112,7 +112,7 @@ defmodule Scrivener.HTML do
     links = raw_pagination_links(paginator)
     |> Enum.map fn ({text, page_number})->
       classes = []
-      if paginator[:page_number] == page_number do
+      if paginator.page_number == page_number do
         classes = ["active"]
       end
       params_with_page = Dict.merge(params, page: page_number)
@@ -148,14 +148,14 @@ defmodule Scrivener.HTML do
   """
   def raw_pagination_links(paginator, options \\ []) do
     options = Dict.merge @defaults, options
-    page_number_list(paginator[:page_number], paginator[:total_pages], options[:distance])
-    |> add_first(paginator[:page_number], options[:distance], options[:first])
-    |> add_previous(paginator[:page_number])
-    |> add_last(paginator[:page_number], paginator[:total_pages], options[:distance], options[:last])
-    |> add_next(paginator[:page_number], paginator[:total_pages])
+    page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
+    |> add_first(paginator.page_number, options[:distance], options[:first])
+    |> add_previous(paginator.page_number)
+    |> add_last(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
+    |> add_next(paginator.page_number, paginator.total_pages)
     |> Enum.map(fn
-      :next -> if options[:next], do: {options[:next], paginator[:page_number] + 1}
-      :previous -> if options[:previous], do: {options[:previous], paginator[:page_number] - 1}
+      :next -> if options[:next], do: {options[:next], paginator.page_number + 1}
+      :previous -> if options[:previous], do: {options[:previous], paginator.page_number - 1}
       num -> {num, num}
     end) |> Enum.filter(&(&1))
   end
