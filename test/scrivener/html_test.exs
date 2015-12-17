@@ -145,6 +145,10 @@ defmodule Scrivener.HTMLTest do
       end
     end
 
+    it "handles no entries" do
+      assert {:safe, _html} = HTML.pagination_links(%Page{total_entries: 0})
+    end
+
   end
 
 end
