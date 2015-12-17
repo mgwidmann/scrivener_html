@@ -1,8 +1,31 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
-
+  @defaults [view_style: :bootstrap]
+  @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true]
   @moduledoc """
-  Primary helper to use is `Scrivener.HTML.pagination_links/4`.
+  For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
+
+      config :scrivener_html,
+        routes_helper: MyApp.Router.Helpers
+
+  Import to you view.
+
+      defmodule MyApp.UserView do
+        use MyApp.Web, :view
+        import Scrivener.HTML
+      end
+
+  Use in your template.
+
+      <%= pagination_links @conn, @page %>
+
+  Where `@page` is a `%Scrivener.Page{}` struct returned from `Repo.paginate/2`.
+
+  Customize output. Below are the defaults.
+
+      <%= pagination_links @conn, @page, distance: 5, next: ">>", previous: "<<", first: true, last: true %>
+
+  See `Scrivener.HTML.raw_pagination_links/2` for option descriptions.
 
   For custom HTML output, see `Scrivener.HTML.raw_pagination_links/2`.
   """
@@ -19,7 +42,6 @@ defmodule Scrivener.HTML do
     end
   end
 
-  @defaults [view_style: :bootstrap]
   @doc """
   Generates the HTML pagination links for a given paginator returned by Scrivener.
 
@@ -57,7 +79,7 @@ defmodule Scrivener.HTML do
   as `params` to the path helper function. For example, `@post`, which has an index of paginated
   `@comments` would look like the following:
 
-      Scrivener.HTML.pagination_links(@conn, @comments, [@post.id], view_style: :bootstrap, my_param: "foo")
+      Scrivener.HTML.pagination_links(@conn, @comments, [@post], view_style: :bootstrap, my_param: "foo")
 
   You'll need to be sure to configure `:scrivener_html` with the `:routes_helper`
   module (ex. MyApp.Routes.Helpers) in Phoenix. With that configured, the above would generate calls
@@ -67,7 +89,7 @@ defmodule Scrivener.HTML do
   correct path function to use by adding an extra key in the `opts` parameter of `:path`.
   For example:
 
-      Scrivener.HTML.pagination_links(@conn, @comments, [@post.id], path: &post_comment_path/4)
+      Scrivener.HTML.pagination_links(@conn, @comments, [@post], path: &post_comment_path/4)
 
   Be sure to supply the function which accepts query string parameters (starts at arity 3, +1 for each relation),
   because the `page` parameter will always be supplied. If you supply the wrong function you will receive a
@@ -77,7 +99,7 @@ defmodule Scrivener.HTML do
     merged_opts = Dict.merge @defaults,
               view_style: opts[:view_style] || Application.get_env(:scrivener_html, :view_style, :bootstrap)
 
-    path = opts[:path] || find_path_fn(paginator[:entries], args)
+    path = opts[:path] || find_path_fn(conn && paginator.entries, args)
     params = Dict.drop opts, (Dict.keys(@defaults) ++ [:path])
 
     # Ensure ordering so pattern matching is reliable
@@ -97,13 +119,17 @@ defmodule Scrivener.HTML do
   # Define a different version of `find_path_fn` whenever Phoenix is available.
   if Code.ensure_loaded(Phoenix.Naming) do
     defp find_path_fn(entries, path_args) do
-      routes_helper_module = Application.get_env(:scrivener_html, :routes_helper) || raise("Scrivener.HTML: Unable to find configured routes_helper module (ex. MyApp.RoutesHelper)")
-      path = (path_args ++ [entries |> List.first]) |> Enum.reduce &( :"#{&2}_#{Phoenix.Naming.resource_name(&1[:__struct__])}")
-      {path_fn, []} = Code.eval_quoted(quote do: &unquote(routes_helper_module).unquote(path)/unquote((path_args |> Enum.count) + 3))
+      routes_helper_module = Application.get_env(:scrivener_html, :routes_helper) || raise("Scrivener.HTML: Unable to find configured routes_helper module (ex. MyApp.Router.Helper)")
+      path = (path_args) |> Enum.reduce(name_for(List.first(entries), ""), &name_for/2)
+      {path_fn, []} = Code.eval_quoted(quote do: &unquote(routes_helper_module).unquote(:"#{path <> "_path"}")/unquote(length(path_args) + 3))
       path_fn
     end
   else
     defp find_path_fn(_entries, _args), do: &Default/3
+  end
+
+  defp name_for(model, acc) do
+    "#{acc}#{if(acc != "", do: "_")}#{Phoenix.Naming.resource_name(model.__struct__)}"
   end
 
   # Bootstrap implementation
@@ -129,14 +155,13 @@ defmodule Scrivener.HTML do
     raise "Scrivener.HTML: Unable to render view_style #{inspect unknown}"
   end
 
-  @defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true]
   @doc """
   Returns the raw data in order to generate the proper HTML for pagination links. Data
   is returned in a `{text, page_number}` format where `text` is intended to be the text
   of the link and `page_number` is the page it should go to. Defaults are already supplied
   and they are as follows:
 
-      #{inspect @defaults}
+      #{inspect @raw_defaults}
 
   `distance` must be a positive non-zero integer or an exception is raised. `next` and `previous` should be
   strings but can be anything you want as long as it is truthy, falsey values will remove
@@ -149,15 +174,15 @@ defmodule Scrivener.HTML do
   Simply loop and pattern match over each item and transform it to your custom HTML.
   """
   def raw_pagination_links(paginator, options \\ []) do
-    options = Dict.merge @defaults, options
-    page_number_list(paginator[:page_number], paginator[:total_pages], options[:distance])
-    |> add_first(paginator[:page_number], options[:distance], options[:first])
-    |> add_previous(paginator[:page_number])
-    |> add_last(paginator[:page_number], paginator[:total_pages], options[:distance], options[:last])
-    |> add_next(paginator[:page_number], paginator[:total_pages])
+    options = Dict.merge @raw_defaults, options
+    page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
+    |> add_first(paginator.page_number, options[:distance], options[:first])
+    |> add_previous(paginator.page_number)
+    |> add_last(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
+    |> add_next(paginator.page_number, paginator.total_pages)
     |> Enum.map(fn
-      :next -> if options[:next], do: {options[:next], paginator[:page_number] + 1}
-      :previous -> if options[:previous], do: {options[:previous], paginator[:page_number] - 1}
+      :next -> if options[:next], do: {options[:next], paginator.page_number + 1}
+      :previous -> if options[:previous], do: {options[:previous], paginator.page_number - 1}
       num -> {num, num}
     end) |> Enum.filter(&(&1))
   end

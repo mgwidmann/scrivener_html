@@ -6,6 +6,10 @@ defmodule Scrivener.Support.HTML do
   def pages_with_last(range, last), do: pages(range) ++ [{last, last}]
   def pages_with_next(range, next), do: pages(range) ++ [{">>", next}]
   def pages_with_previous(previous, range), do: [{"<<", previous}] ++ pages(range)
-  def links_with_opts(paginator, opts \\ []), do: HTML.raw_pagination_links(Enum.into(%Scrivener.Page{}, paginator), Dict.merge([next: false, previous: false, first: false, last: false], opts))
+  def links_with_opts(paginator, opts \\ []) do
+    paginator
+    |> Enum.into(%{})
+    |> HTML.raw_pagination_links(Dict.merge([next: false, previous: false, first: false, last: false], opts))
+  end
 
 end
