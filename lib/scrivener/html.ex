@@ -139,7 +139,7 @@ defmodule Scrivener.HTML do
         raw_pagination_links(paginator)
         |> Enum.map fn ({text, page_number})->
           classes = []
-          if paginator[:page_number] == page_number do
+          if paginator.page_number == page_number do
             classes = ["active"]
           end
           params_with_page = Dict.merge(params, page: page_number)
