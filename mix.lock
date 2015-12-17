@@ -4,9 +4,9 @@
   "ex_doc": {:hex, :ex_doc, "0.10.0"},
   "meck": {:hex, :meck, "0.8.3"},
   "pavlov": {:hex, :pavlov, "0.2.3"},
-  "phoenix": {:hex, :phoenix, "1.0.3"},
-  "phoenix_html": {:hex, :phoenix_html, "2.2.0"},
-  "plug": {:hex, :plug, "1.0.2"},
+  "phoenix": {:hex, :phoenix, "1.1.0"},
+  "phoenix_html": {:hex, :phoenix_html, "2.3.0"},
+  "plug": {:hex, :plug, "1.0.3"},
   "poison": {:hex, :poison, "1.5.0"},
   "poolboy": {:hex, :poolboy, "1.5.1"},
   "scrivener": {:hex, :scrivener, "1.0.0"}}
