@@ -95,7 +95,6 @@ defmodule Scrivener.HTML do
   because the `page` parameter will always be supplied. If you supply the wrong function you will receive a
   function undefined exception.
   """
-  def pagination_links(_, %Scrivener.Page{total_entries: 0}, _, _), do: {:safe, ""}
   def pagination_links(conn, paginator, args, opts) do
     merged_opts = Dict.merge @defaults,
               view_style: opts[:view_style] || Application.get_env(:scrivener_html, :view_style, :bootstrap)
