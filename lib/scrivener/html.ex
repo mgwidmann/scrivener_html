@@ -116,6 +116,7 @@ defmodule Scrivener.HTML do
   def pagination_links(conn, paginator, [_ | _] = args), do: pagination_links(conn, paginator, args, [])
 
   defp find_path_fn(nil, _path_args), do: &Default.path/3
+  defp find_path_fn([], _path_args), do: fn _, _, _ -> nil end
   # Define a different version of `find_path_fn` whenever Phoenix is available.
   if Code.ensure_loaded(Phoenix.Naming) do
     defp find_path_fn(entries, path_args) do
@@ -144,7 +145,13 @@ defmodule Scrivener.HTML do
           end
           params_with_page = Dict.merge(params, page: page_number)
           content_tag :li do
-            link("#{text}", to: apply(path, args ++ [params_with_page]), class: Enum.join(classes, " "))
+            to = apply(path, args ++ [params_with_page])
+            class = Enum.join(classes, " ")
+            if to do
+              link "#{text}", to: apply(path, args ++ [params_with_page]), class: class
+            else
+              content_tag :a, "#{text}", class: class
+            end
           end
         end
       end
@@ -204,6 +211,9 @@ defmodule Scrivener.HTML do
   end
 
   # End distance computation
+  defp end_distance(_page, 0, _distance) do
+    0
+  end
   defp end_distance(page, total, distance) when page + distance >= total do
     total - page
   end
@@ -233,7 +243,7 @@ defmodule Scrivener.HTML do
     list
   end
 
-  defp add_next(list, page, total) when page != total do
+  defp add_next(list, page, total) when page != total and page < total do
     list ++ [:next]
   end
   defp add_next(list, _page, _total) do

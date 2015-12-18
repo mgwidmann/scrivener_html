@@ -144,12 +144,19 @@ defmodule Scrivener.HTMLTest do
         HTML.pagination_links(%Page{total_pages: 10, page_number: 5}, view_style: :unknown)
       end
     end
+  end
 
+  describe "Phoenix conn()" do
     it "handles no entries" do
       use Phoenix.ConnTest
       Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
 
-      assert {:safe, _html} = HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
+      assert {:safe, ["<nav>",
+                      ["<ul class=\"pagination\">",
+                        [["<li>", ["<a class=\"active\">", "1", "</a>"], "</li>"]],
+                      "</ul>"],
+                    "</nav>"]} =
+        HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
     end
 
   end
