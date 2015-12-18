@@ -145,6 +145,13 @@ defmodule Scrivener.HTMLTest do
       end
     end
 
+    it "handles no entries" do
+      use Phoenix.ConnTest
+      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
+
+      assert {:safe, _html} = HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
+    end
+
   end
 
 end
