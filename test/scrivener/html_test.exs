@@ -117,7 +117,7 @@ defmodule Scrivener.HTMLTest do
       end
 
       it "does not allow negative distances" do
-        assert_raise RuntimeError, fn ->
+        assert_raise RuntimeError, "Scrivener.HTML: Distance cannot be less than one.", fn ->
           links_with_opts [total_pages: 10, page_number: 5], distance: -5
         end
       end
@@ -126,6 +126,9 @@ defmodule Scrivener.HTMLTest do
   end
 
   describe "pagination_links" do
+    before :each do
+      Application.put_env(:scrivener_html, :view_style, :bootstrap)
+    end
 
     it "accepts a paginator and options (same as defaults)" do
       assert {:safe, _html} = HTML.pagination_links(%Page{total_pages: 10, page_number: 5}, view_style: :bootstrap, path: &MyApp.Router.Helpers.post_path/3)
@@ -133,6 +136,19 @@ defmodule Scrivener.HTMLTest do
 
     it "supplies defaults" do
       assert {:safe, _html} = HTML.pagination_links(%Page{total_pages: 10, page_number: 5})
+    end
+
+    context "application config" do
+      before :each do
+        Application.put_env(:scrivener_html, :view_style, :another_style)
+      end
+
+      it "uses application config" do
+        assert_raise RuntimeError, "Scrivener.HTML: Unable to render view_style :another_style", fn ->
+          HTML.pagination_links(%Page{total_pages: 10, page_number: 5})
+        end
+      end
+
     end
 
     it "allows options in any order" do
