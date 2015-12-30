@@ -1,6 +1,6 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
-  @defaults [view_style: :bootstrap]
+  @defaults [view_style: :bootstrap, action: :index]
   @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true]
   @moduledoc """
   For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
@@ -96,8 +96,8 @@ defmodule Scrivener.HTML do
   function undefined exception.
   """
   def pagination_links(conn, paginator, args, opts) do
-    merged_opts = Dict.merge @defaults,
-              view_style: opts[:view_style] || Application.get_env(:scrivener_html, :view_style, :bootstrap)
+    opts = Dict.merge opts, view_style: opts[:view_style] || Application.get_env(:scrivener_html, :view_style, :bootstrap)
+    merged_opts = Dict.merge @defaults, opts
 
     path = opts[:path] || find_path_fn(conn && paginator.entries, args)
     params = Dict.drop opts, (Dict.keys(@defaults) ++ [:path])
@@ -106,7 +106,7 @@ defmodule Scrivener.HTML do
     _pagination_links paginator,
       view_style: merged_opts[:view_style],
       path: path,
-      args: [conn, :index] ++ args,
+      args: [conn, merged_opts[:action]] ++ args,
       params: params
   end
   def pagination_links(%Scrivener.Page{} = paginator), do: pagination_links(nil, paginator, [], [])

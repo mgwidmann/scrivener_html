@@ -144,6 +144,11 @@ defmodule Scrivener.HTMLTest do
         HTML.pagination_links(%Page{total_pages: 10, page_number: 5}, view_style: :unknown)
       end
     end
+
+    it "accepts an override action" do
+      html = HTML.pagination_links(%Page{total_pages: 10, page_number: 5}, view_style: :bootstrap, action: :edit, path: &MyApp.Router.Helpers.post_path/3)
+      assert Phoenix.HTML.safe_to_string(html) =~ ~r(\/posts\/:id\/edit)
+    end
   end
 
   describe "Phoenix conn()" do
