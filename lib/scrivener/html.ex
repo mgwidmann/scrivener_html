@@ -158,6 +158,27 @@ defmodule Scrivener.HTML do
     end
   end
 
+  # Semantic UI implementation
+  defp _pagination_links(paginator, [view_style: :semantic, path: path, args: args, params: params]) do
+    content_tag :div, class: "ui pagination menu" do
+      raw_pagination_links(paginator)
+      |> Enum.map fn({text, page_number}) ->
+        classes = ["item"]
+        if paginator.page_number == page_number do
+          classes = ["active", "item"]
+        end
+        params_with_page = Dict.merge(params, page: page_number)
+        to = apply(path, args ++ [params_with_page])
+        class = Enum.join(classes, " ")
+        if to do
+          link "#{text}", to: apply(path, args ++ [params_with_page]), class: class
+        else
+          content_tag :a, "#{text}", class: class
+        end
+      end
+    end
+  end
+
   defp _pagination_links(_paginator, [view_style: unknown, path: _path, args: _args, params: _params]) do
     raise "Scrivener.HTML: Unable to render view_style #{inspect unknown}"
   end
