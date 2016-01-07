@@ -1,6 +1,7 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
   @defaults [view_style: :bootstrap, action: :index]
+  @view_styles [:bootstrap, :semantic]
   @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true]
   @moduledoc """
   For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
@@ -51,7 +52,9 @@ defmodule Scrivener.HTML do
 
   The `view_style` indicates which CSS framework you are using. The default is
   `:bootstrap`, but you can add your own using the `Scrivener.HTML.raw_pagination_links/2` function
-  if desired.
+  if desired. The full list of available `view_style`s is here:
+
+      #{inspect @view_styles}
 
   An example of the output data:
 
@@ -133,6 +136,10 @@ defmodule Scrivener.HTML do
     "#{acc}#{if(acc != "", do: "_")}#{Phoenix.Naming.resource_name(model.__struct__)}"
   end
 
+  defp _pagination_links(_paginator, [view_style: style, path: _path, args: _args, params: _params]) when not style in @view_styles do
+    raise "Scrivener.HTML: View style #{inspect style} is not a valid view style. Please use one of #{inspect @view_styles}"
+  end
+
   # Bootstrap implementation
   defp _pagination_links(paginator, [view_style: :bootstrap, path: path, args: args, params: params]) do
     content_tag :nav do
@@ -177,10 +184,6 @@ defmodule Scrivener.HTML do
         end
       end
     end
-  end
-
-  defp _pagination_links(_paginator, [view_style: unknown, path: _path, args: _args, params: _params]) do
-    raise "Scrivener.HTML: Unable to render view_style #{inspect unknown}"
   end
 
   @doc """

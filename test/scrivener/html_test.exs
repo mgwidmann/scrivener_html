@@ -144,7 +144,7 @@ defmodule Scrivener.HTMLTest do
       end
 
       it "uses application config" do
-        assert_raise RuntimeError, "Scrivener.HTML: Unable to render view_style :another_style", fn ->
+        assert_raise RuntimeError, "Scrivener.HTML: View style :another_style is not a valid view style. Please use one of [:bootstrap, :semantic]", fn ->
           HTML.pagination_links(%Page{total_pages: 10, page_number: 5})
         end
       end
