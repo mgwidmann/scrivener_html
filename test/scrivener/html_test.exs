@@ -170,6 +170,7 @@ defmodule Scrivener.HTMLTest do
   describe "Phoenix conn()" do
     it "handles no entries" do
       use Phoenix.ConnTest
+      Application.put_env(:scrivener_html, :view_style, :bootstrap)
       Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
 
       assert {:safe, ["<nav>",
@@ -179,7 +180,20 @@ defmodule Scrivener.HTMLTest do
                     "</nav>"]} =
         HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
     end
-
   end
 
+  describe "alternative view styles" do
+    describe "Semantic UI" do
+      it "renders Semantic UI styling" do
+        use Phoenix.ConnTest
+        Application.put_env(:scrivener_html, :view_style, :semantic)
+        Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
+
+        assert {:safe, ["<div class=\"ui pagination menu\">",
+                        [["<a class=\"active item\">", "1", "</a>"]],
+                      "</div>"]} =
+          HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
+      end
+    end
+  end
 end
