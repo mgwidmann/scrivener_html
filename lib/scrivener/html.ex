@@ -145,7 +145,7 @@ defmodule Scrivener.HTML do
     content_tag :nav do
       content_tag :ul, class: "pagination" do
         raw_pagination_links(paginator, params)
-        |> Enum.map fn ({text, page_number})->
+        |> Enum.map(fn ({text, page_number})->
           classes = []
           if paginator.page_number == page_number do
             classes = ["active"]
@@ -160,7 +160,7 @@ defmodule Scrivener.HTML do
               content_tag :a, "#{text}", class: class
             end
           end
-        end
+        end)
       end
     end
   end
@@ -169,7 +169,7 @@ defmodule Scrivener.HTML do
   defp _pagination_links(paginator, [view_style: :semantic, path: path, args: args, params: params]) do
     content_tag :div, class: "ui pagination menu" do
       raw_pagination_links(paginator, params)
-      |> Enum.map fn({text, page_number}) ->
+      |> Enum.map(fn({text, page_number}) ->
         classes = ["item"]
         if paginator.page_number == page_number do
           classes = ["active", "item"]
@@ -182,7 +182,7 @@ defmodule Scrivener.HTML do
         else
           content_tag :a, "#{text}", class: class
         end
-      end
+      end)
     end
   end
 
