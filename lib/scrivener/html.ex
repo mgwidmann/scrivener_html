@@ -142,15 +142,16 @@ defmodule Scrivener.HTML do
 
   # Bootstrap implementation
   defp _pagination_links(paginator, [view_style: :bootstrap, path: path, args: args, params: params]) do
+    url_params = Dict.drop params, Dict.keys(@raw_defaults)
     content_tag :nav do
       content_tag :ul, class: "pagination" do
-        raw_pagination_links(paginator)
-        |> Enum.map fn ({text, page_number})->
+        raw_pagination_links(paginator, params)
+        |> Enum.map(fn ({text, page_number})->
           classes = []
           if paginator.page_number == page_number do
             classes = ["active"]
           end
-          params_with_page = Dict.merge(params, page: page_number)
+          params_with_page = Dict.merge(url_params, page: page_number)
           content_tag :li do
             to = apply(path, args ++ [params_with_page])
             class = Enum.join(classes, " ")
@@ -160,21 +161,22 @@ defmodule Scrivener.HTML do
               content_tag :a, "#{text}", class: class
             end
           end
-        end
+        end)
       end
     end
   end
 
   # Semantic UI implementation
   defp _pagination_links(paginator, [view_style: :semantic, path: path, args: args, params: params]) do
+    url_params = Dict.drop params, Dict.keys(@raw_defaults)
     content_tag :div, class: "ui pagination menu" do
-      raw_pagination_links(paginator)
-      |> Enum.map fn({text, page_number}) ->
+      raw_pagination_links(paginator, params)
+      |> Enum.map(fn({text, page_number}) ->
         classes = ["item"]
         if paginator.page_number == page_number do
           classes = ["active", "item"]
         end
-        params_with_page = Dict.merge(params, page: page_number)
+        params_with_page = Dict.merge(url_params, page: page_number)
         to = apply(path, args ++ [params_with_page])
         class = Enum.join(classes, " ")
         if to do
@@ -182,7 +184,7 @@ defmodule Scrivener.HTML do
         else
           content_tag :a, "#{text}", class: class
         end
-      end
+      end)
     end
   end
 
