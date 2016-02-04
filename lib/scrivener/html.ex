@@ -208,9 +208,10 @@ defmodule Scrivener.HTML do
   """
   def raw_pagination_links(paginator, options \\ []) do
     options = Dict.merge @raw_defaults, options
-    page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
+
+    add_previous(paginator.page_number)
     |> add_first(paginator.page_number, options[:distance], options[:first])
-    |> add_previous(paginator.page_number)
+    |> page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
     |> add_last(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
     |> add_next(paginator.page_number, paginator.total_pages)
     |> Enum.map(fn
@@ -221,42 +222,42 @@ defmodule Scrivener.HTML do
   end
 
   # Computing page number ranges
-  defp page_number_list(page, total, distance) when is_integer(distance) and distance >= 1 do
-    Enum.to_list((page - beginning_distance(page, distance))..(page + end_distance(page, total, distance)))
+  defp page_number_list(list, page, total, distance) when is_integer(distance) and distance >= 1 do
+    list ++ Enum.to_list(beginning_distance(page, distance)..end_distance(page, total, distance))
   end
-  defp page_number_list(_page, _total, _distance) do
+  defp page_number_list(_list, _page, _total, _distance) do
     raise "Scrivener.HTML: Distance cannot be less than one."
   end
 
   # Beginning distance computation
   defp beginning_distance(page, distance) when page - distance < 1 do
-    distance + (page - distance - 1)
+    page - (distance + (page - distance - 1))
   end
-  defp beginning_distance(_page, distance) do
-    distance
+  defp beginning_distance(page, distance) do
+    page - distance
   end
 
   # End distance computation
-  defp end_distance(_page, 0, _distance) do
-    0
+  defp end_distance(page, 0, _distance) do
+    page
   end
   defp end_distance(page, total, distance) when page + distance >= total do
-    total - page
+    total
   end
-  defp end_distance(_page, _total, distance) do
-    distance
+  defp end_distance(page, _total, distance) do
+    page + distance
   end
 
   # Adding next/prev/first/last links
-  defp add_previous(list, page) when page != 1 do
-    [:previous] ++ list
+  defp add_previous(page) when page != 1 do
+    [:previous]
   end
-  defp add_previous(list, _page) do
-    list
+  defp add_previous(_page) do
+    []
   end
 
   defp add_first(list, page, distance, true) when page - distance > 1 do
-    [1] ++ list
+    [1 | list]
   end
   defp add_first(list, _page, _distance, _included) do
     list
@@ -283,8 +284,4 @@ defimpl Enumerable, for: Scrivener.Page do
   def reduce(pages, acc, fun), do: Enum.reduce(pages.entries || [], acc, fun)
   def member?(pages, page), do: page in pages.entries
   def count(pages), do: length(pages.entries)
-end
-defimpl Access, for: Scrivener.Page do
-  def get(pages, key), do: Map.get(pages, key)
-  def get_and_update(pages, key, fun), do: Map.get_and_update(pages, key, fun)
 end
