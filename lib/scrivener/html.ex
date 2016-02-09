@@ -155,7 +155,7 @@ defmodule Scrivener.HTML do
           content_tag :li, class: Enum.join(classes, " ") do
             to = apply(path, args ++ [params_with_page])
             if to do
-              link "#{text}", to: to)
+              link "#{text}", to: to
             else
               content_tag :a, "#{text}"
             end
