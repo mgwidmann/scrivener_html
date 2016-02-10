@@ -175,7 +175,7 @@ defmodule Scrivener.HTMLTest do
 
       assert {:safe, ["<nav>",
                       ["<ul class=\"pagination\">",
-                        [["<li>", ["<a class=\"active\">", "1", "</a>"], "</li>"]],
+                        [["<li class=\"active\">", ["<a>", "1", "</a>"], "</li>"]],
                       "</ul>"],
                     "</nav>"]} =
         HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
