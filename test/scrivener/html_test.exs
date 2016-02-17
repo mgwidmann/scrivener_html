@@ -144,7 +144,7 @@ defmodule Scrivener.HTMLTest do
       end
 
       it "uses application config" do
-        assert_raise RuntimeError, "Scrivener.HTML: View style :another_style is not a valid view style. Please use one of [:bootstrap, :semantic]", fn ->
+        assert_raise RuntimeError, "Scrivener.HTML: View style :another_style is not a valid view style. Please use one of [:bootstrap, :semantic, :foundation]", fn ->
           HTML.pagination_links(%Page{total_pages: 10, page_number: 5})
         end
       end
@@ -193,6 +193,20 @@ defmodule Scrivener.HTMLTest do
                         [["<a class=\"active item\">", "1", "</a>"]],
                       "</div>"]} =
           HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
+      end
+    end
+
+    describe "Foundation for Sites 6.x" do
+      it "renders Foundation for Sites 6.x styling" do
+        use Phoenix.ConnTest
+        Application.put_env(:scrivener_html, :view_style, :foundation)
+        Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
+
+        assert {:safe, ["<ul class=\"pagination\" role=\"pagination\">",
+                        [["<li class=\"current\">", ["<span>", "1", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<a>", "2", "</a>"], "</li>"],
+                         ["<li class=\"\">", ["<a>", "&gt;&gt;", "</a>"], "</li>"]], "</ul>"]} =
+          HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 20, total_pages: 2})
       end
     end
   end

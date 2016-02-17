@@ -1,7 +1,7 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
   @defaults [view_style: :bootstrap, action: :index]
-  @view_styles [:bootstrap, :semantic]
+  @view_styles [:bootstrap, :semantic, :foundation]
   @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true]
   @moduledoc """
   For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
@@ -182,6 +182,34 @@ defmodule Scrivener.HTML do
           link "#{text}", to: apply(path, args ++ [params_with_page]), class: class
         else
           content_tag :a, "#{text}", class: class
+        end
+      end)
+    end
+  end
+
+  # Foundation for Sites 6.x implementation
+  defp _pagination_links(paginator, [view_style: :foundation, path: path, args: args, params: params]) do
+    url_params = Dict.drop params, Dict.keys(@raw_defaults)
+    content_tag :ul, class: "pagination", role: "pagination" do
+      raw_pagination_links(paginator, params)
+      |> Enum.map(fn({text, page_number}) ->
+        classes = []
+        if paginator.page_number == page_number do
+          classes = ["current"]
+        end
+        params_with_page = Dict.merge(url_params, page: page_number)
+        to = apply(path, args ++ [params_with_page])
+        class = Enum.join(classes, " ")
+        content_tag :li, class: class do
+          if paginator.page_number == page_number do
+            content_tag :span, "#{text}"
+          else
+            if to do
+              link "#{text}", to: apply(path, args ++ [params_with_page])
+            else
+              content_tag :a, "#{text}"
+            end
+          end
         end
       end)
     end
