@@ -43,12 +43,21 @@ Where `@page` is a `%Scrivener.Page{}` struct returned from `Repo.paginate/2`.
 Customize output. Below are the defaults.
 
 ```elixir
-<%= pagination_links @conn, @page, distance: 5, next: ">>", previous: "<<", first: true, last: true %>
+<%= pagination_links @conn, @page, distance: 5, next: ">>", previous: "<<", first: true, last: true, view_style: :bootstrap %>
 ```
 
-See `Scrivener.HTML.raw_pagination_links/2` for option descriptions.
+There are three view styles currently supported:
+
+- `:bootstrap` (the default) This styles the pagination links in a manner that
+  is expected by Bootstrap 3.x.
+- `:foundation` This styles the pagination links in a manner that is expected
+  by Foundation for Sites 6.x.
+- `:semantic` This styles the pagination links in a manner that is expected by
+  Semantic UI 2.x.
 
 For custom HTML output, see `Scrivener.HTML.raw_pagination_links/2`.
+
+See `Scrivener.HTML.raw_pagination_links/2` for option descriptions.
 
 Scrivener.HTML can be included in your view and then just used with a simple call to `pagination_links/1`.
 
