@@ -2,7 +2,7 @@
 
 Helpers built to work with [Scrivener](https://github.com/drewolson/scrivener)'s page struct to easily build HTML output for various CSS frameworks.
 
-## Example Usage
+## Setup
 
 Add to `mix.exs`
 
@@ -32,6 +32,8 @@ defmodule MyApp.UserView do
 end
 ```
 
+## Example Usage
+
 Use in your template.
 
 ```elixir
@@ -40,7 +42,33 @@ Use in your template.
 
 Where `@page` is a `%Scrivener.Page{}` struct returned from `Repo.paginate/2`.
 
-Customize output. Below are the defaults.
+If your resource has any url parameters to be supplied, you should provide them as the 3rd parameter. For example, given a scope like:
+
+```elixir
+scope "/:locale", App do
+  pipe_through [:browser]
+
+  get "/page", PageController, :index
+end
+```
+
+You would need to pass in the `:locale` parameter like so:
+
+```elixir
+<%= pagination_links @conn, @page, ["en"] %>
+```
+
+Any additional query string parameters can be passed in as well.
+
+```elixir
+<%= pagination_links @conn, @page, ["en"], some_parameter: "data" %>
+<%# OR IF NO URL PARAMETERS %>
+<%= pagination_links @conn, @page, some_parameter: "data" %>
+```
+
+## Customizing Output
+
+Below are the defaults which are used without passing in any options.
 
 ```elixir
 <%= pagination_links @conn, @page, distance: 5, next: ">>", previous: "<<", first: true, last: true, view_style: :bootstrap %>
