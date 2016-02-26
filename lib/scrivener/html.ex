@@ -99,11 +99,11 @@ defmodule Scrivener.HTML do
   function undefined exception.
   """
   def pagination_links(conn, paginator, args, opts) do
-    opts = Dict.merge opts, view_style: opts[:view_style] || Application.get_env(:scrivener_html, :view_style, :bootstrap)
-    merged_opts = Dict.merge @defaults, opts
+    opts = Keyword.merge opts, view_style: opts[:view_style] || Application.get_env(:scrivener_html, :view_style, :bootstrap)
+    merged_opts = Keyword.merge @defaults, opts
 
     path = opts[:path] || find_path_fn(conn && paginator.entries, args)
-    params = Dict.drop opts, (Dict.keys(@defaults) ++ [:path])
+    params = Keyword.drop opts, (Keyword.keys(@defaults) ++ [:path])
 
     # Ensure ordering so pattern matching is reliable
     _pagination_links paginator,
@@ -142,7 +142,7 @@ defmodule Scrivener.HTML do
 
   # Bootstrap implementation
   defp _pagination_links(paginator, [view_style: :bootstrap, path: path, args: args, params: params]) do
-    url_params = Dict.drop params, Dict.keys(@raw_defaults)
+    url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :nav do
       content_tag :ul, class: "pagination" do
         raw_pagination_links(paginator, params)
@@ -151,7 +151,7 @@ defmodule Scrivener.HTML do
           if paginator.page_number == page_number do
             classes = ["active"]
           end
-          params_with_page = Dict.merge(url_params, page: page_number)
+          params_with_page = Keyword.merge(url_params, page: page_number)
           content_tag :li, class: Enum.join(classes, " ") do
             to = apply(path, args ++ [params_with_page])
             if to do
@@ -167,7 +167,7 @@ defmodule Scrivener.HTML do
 
   # Semantic UI implementation
   defp _pagination_links(paginator, [view_style: :semantic, path: path, args: args, params: params]) do
-    url_params = Dict.drop params, Dict.keys(@raw_defaults)
+    url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :div, class: "ui pagination menu" do
       raw_pagination_links(paginator, params)
       |> Enum.map(fn({text, page_number}) ->
@@ -175,7 +175,7 @@ defmodule Scrivener.HTML do
         if paginator.page_number == page_number do
           classes = ["active", "item"]
         end
-        params_with_page = Dict.merge(url_params, page: page_number)
+        params_with_page = Keyword.merge(url_params, page: page_number)
         to = apply(path, args ++ [params_with_page])
         class = Enum.join(classes, " ")
         if to do
@@ -189,7 +189,7 @@ defmodule Scrivener.HTML do
 
   # Foundation for Sites 6.x implementation
   defp _pagination_links(paginator, [view_style: :foundation, path: path, args: args, params: params]) do
-    url_params = Dict.drop params, Dict.keys(@raw_defaults)
+    url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :ul, class: "pagination", role: "pagination" do
       raw_pagination_links(paginator, params)
       |> Enum.map(fn({text, page_number}) ->
@@ -197,7 +197,7 @@ defmodule Scrivener.HTML do
         if paginator.page_number == page_number do
           classes = ["current"]
         end
-        params_with_page = Dict.merge(url_params, page: page_number)
+        params_with_page = Keyword.merge(url_params, page: page_number)
         to = apply(path, args ++ [params_with_page])
         class = Enum.join(classes, " ")
         content_tag :li, class: class do
@@ -234,7 +234,7 @@ defmodule Scrivener.HTML do
   Simply loop and pattern match over each item and transform it to your custom HTML.
   """
   def raw_pagination_links(paginator, options \\ []) do
-    options = Dict.merge @raw_defaults, options
+    options = Keyword.merge @raw_defaults, options
 
     add_previous(paginator.page_number)
     |> add_first(paginator.page_number, options[:distance], options[:first])

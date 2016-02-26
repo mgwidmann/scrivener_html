@@ -9,7 +9,7 @@ defmodule Scrivener.Support.HTML do
   def links_with_opts(paginator, opts \\ []) do
     paginator
     |> Enum.into(%{})
-    |> HTML.raw_pagination_links(Dict.merge([next: false, previous: false, first: false, last: false], opts))
+    |> HTML.raw_pagination_links(Keyword.merge([next: false, previous: false, first: false, last: false], opts))
   end
 
 end
