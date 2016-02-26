@@ -103,7 +103,7 @@ defmodule Scrivener.HTML do
     merged_opts = Keyword.merge @defaults, opts
 
     path = opts[:path] || find_path_fn(conn && paginator.entries, args)
-    params = Keyword.drop opts, (Dict.keys(@defaults) ++ [:path])
+    params = Keyword.drop opts, (Keyword.keys(@defaults) ++ [:path])
 
     # Ensure ordering so pattern matching is reliable
     _pagination_links paginator,
@@ -142,7 +142,7 @@ defmodule Scrivener.HTML do
 
   # Bootstrap implementation
   defp _pagination_links(paginator, [view_style: :bootstrap, path: path, args: args, params: params]) do
-    url_params = Keyword.drop params, Dict.keys(@raw_defaults)
+    url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :nav do
       content_tag :ul, class: "pagination" do
         raw_pagination_links(paginator, params)
@@ -167,7 +167,7 @@ defmodule Scrivener.HTML do
 
   # Semantic UI implementation
   defp _pagination_links(paginator, [view_style: :semantic, path: path, args: args, params: params]) do
-    url_params = Keyword.drop params, Dict.keys(@raw_defaults)
+    url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :div, class: "ui pagination menu" do
       raw_pagination_links(paginator, params)
       |> Enum.map(fn({text, page_number}) ->
@@ -189,7 +189,7 @@ defmodule Scrivener.HTML do
 
   # Foundation for Sites 6.x implementation
   defp _pagination_links(paginator, [view_style: :foundation, path: path, args: args, params: params]) do
-    url_params = Keyword.drop params, Dict.keys(@raw_defaults)
+    url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :ul, class: "pagination", role: "pagination" do
       raw_pagination_links(paginator, params)
       |> Enum.map(fn({text, page_number}) ->
