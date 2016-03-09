@@ -1,6 +1,6 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
-  @defaults [view_style: :bootstrap, action: :index]
+  @defaults [view_style: :bootstrap, action: :index, page_param: :page]
   @view_styles [:bootstrap, :semantic, :foundation]
   @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true]
   @moduledoc """
@@ -110,6 +110,7 @@ defmodule Scrivener.HTML do
       view_style: merged_opts[:view_style],
       path: path,
       args: [conn, merged_opts[:action]] ++ args,
+      page_param: merged_opts[:page_param],
       params: params
   end
   def pagination_links(%Scrivener.Page{} = paginator), do: pagination_links(nil, paginator, [], [])
@@ -136,12 +137,12 @@ defmodule Scrivener.HTML do
     "#{acc}#{if(acc != "", do: "_")}#{Phoenix.Naming.resource_name(model.__struct__)}"
   end
 
-  defp _pagination_links(_paginator, [view_style: style, path: _path, args: _args, params: _params]) when not style in @view_styles do
+  defp _pagination_links(_paginator, [view_style: style, path: _path, args: _args, page_param: _page_param, params: _params]) when not style in @view_styles do
     raise "Scrivener.HTML: View style #{inspect style} is not a valid view style. Please use one of #{inspect @view_styles}"
   end
 
   # Bootstrap implementation
-  defp _pagination_links(paginator, [view_style: :bootstrap, path: path, args: args, params: params]) do
+  defp _pagination_links(paginator, [view_style: :bootstrap, path: path, args: args, page_param: page_param, params: params]) do
     url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :nav do
       content_tag :ul, class: "pagination" do
@@ -151,7 +152,7 @@ defmodule Scrivener.HTML do
           if paginator.page_number == page_number do
             classes = ["active"]
           end
-          params_with_page = Keyword.merge(url_params, page: page_number)
+          params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
           content_tag :li, class: Enum.join(classes, " ") do
             to = apply(path, args ++ [params_with_page])
             if to do
@@ -166,7 +167,7 @@ defmodule Scrivener.HTML do
   end
 
   # Semantic UI implementation
-  defp _pagination_links(paginator, [view_style: :semantic, path: path, args: args, params: params]) do
+  defp _pagination_links(paginator, [view_style: :semantic, path: path, args: args, page_param: page_param, params: params]) do
     url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :div, class: "ui pagination menu" do
       raw_pagination_links(paginator, params)
@@ -175,7 +176,7 @@ defmodule Scrivener.HTML do
         if paginator.page_number == page_number do
           classes = ["active", "item"]
         end
-        params_with_page = Keyword.merge(url_params, page: page_number)
+        params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
         to = apply(path, args ++ [params_with_page])
         class = Enum.join(classes, " ")
         if to do
@@ -188,7 +189,7 @@ defmodule Scrivener.HTML do
   end
 
   # Foundation for Sites 6.x implementation
-  defp _pagination_links(paginator, [view_style: :foundation, path: path, args: args, params: params]) do
+  defp _pagination_links(paginator, [view_style: :foundation, path: path, args: args, page_param: page_param, params: params]) do
     url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :ul, class: "pagination", role: "pagination" do
       raw_pagination_links(paginator, params)
@@ -197,7 +198,7 @@ defmodule Scrivener.HTML do
         if paginator.page_number == page_number do
           classes = ["current"]
         end
-        params_with_page = Keyword.merge(url_params, page: page_number)
+        params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
         to = apply(path, args ++ [params_with_page])
         class = Enum.join(classes, " ")
         content_tag :li, class: class do
