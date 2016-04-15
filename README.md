@@ -52,10 +52,10 @@ scope "/:locale", App do
 end
 ```
 
-You would need to pass in the `:locale` parameter like so:
+You would need to pass in the `:locale` parameter and `:path` option like so:
 
 ```elixir
-<%= pagination_links @conn, @page, ["en"] %>
+<%= pagination_links @conn, @page, ["en"], path: &page_path/4 %>
 ```
 
 Any additional query string parameters can be passed in as well.
