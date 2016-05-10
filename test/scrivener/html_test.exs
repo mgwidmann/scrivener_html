@@ -68,6 +68,10 @@ defmodule Scrivener.HTMLTest do
         assert pages_with_previous(49, 45..55) == links_with_opts [total_pages: 100, page_number: 50], previous: "<<"
       end
 
+      it "includes a previous before the first" do
+        assert [{"<<", 49}] ++ [{1, 1}] ++ pages(45..55) == links_with_opts [total_pages: 100, page_number: 50], previous: "<<", first: true
+      end
+
       it "does not include previous when equal to page 1" do
         assert pages(1..6) == links_with_opts [total_pages: 10, page_number: 1], previous: "<<"
       end
