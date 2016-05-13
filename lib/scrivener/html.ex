@@ -237,8 +237,8 @@ defmodule Scrivener.HTML do
   def raw_pagination_links(paginator, options \\ []) do
     options = Keyword.merge @raw_defaults, options
 
-    add_previous(paginator.page_number)
-    |> add_first(paginator.page_number, options[:distance], options[:first])
+    add_first(paginator.page_number, options[:distance], options[:first])
+    |> add_previous(paginator.page_number)
     |> page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
     |> add_last(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
     |> add_next(paginator.page_number, paginator.total_pages)
@@ -277,18 +277,18 @@ defmodule Scrivener.HTML do
   end
 
   # Adding next/prev/first/last links
-  defp add_previous(page) when page != 1 do
-    [:previous]
+  defp add_previous(list, page) when page != 1 do
+    [:previous | list]
   end
-  defp add_previous(_page) do
-    []
+  defp add_previous(list, _page) do
+    list
   end
 
-  defp add_first(list, page, distance, true) when page - distance > 1 do
-    [1 | list]
+  defp add_first(page, distance, true) when page - distance > 1 do
+    [1]
   end
-  defp add_first(list, _page, _distance, _included) do
-    list
+  defp add_first(_page, _distance, _included) do
+    []
   end
 
   defp add_last(list, page, total, distance, true) when page + distance < total do
