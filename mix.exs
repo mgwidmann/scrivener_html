@@ -4,7 +4,7 @@ defmodule ScrivenerHtml.Mixfile do
   def project do
     [app: :scrivener_html,
      version: "1.0.10",
-     elixir: "~> 1.0",
+     elixir: "~> 1.2",
      name: "scrivener_html",
      source_url: "git@github.com:mgwidmann/scrivener_html.git",
      homepage_url: "https://github.com/mgwidmann/scrivener_html",
