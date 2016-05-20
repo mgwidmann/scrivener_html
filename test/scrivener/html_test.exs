@@ -217,6 +217,20 @@ defmodule Scrivener.HTMLTest do
                          ["<li class=\"\">", ["<a>", "&gt;&gt;", "</a>"], "</li>"]], "</ul>"]} =
           HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 20, total_pages: 2})
       end
+
+      it "renders Foundation for Sites 6.x styling with ellipsis" do
+        use Phoenix.ConnTest
+        Application.put_env(:scrivener_html, :view_style, :foundation)
+        Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
+
+        assert {:safe, ["<ul class=\"pagination\" role=\"pagination\">",
+                        [["<li class=\"\">", ["<a>", "&lt;&lt;", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "1", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "2", "</a>"], "</li>"],
+                         ["<li class=\"current\">", ["<span>", "3", "</span>"], "</li>"], ["<li class=\"\">", ["<a>", "4", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "5", "</a>"], "</li>"],
+                         ["<li class=\"\">", ["<a>", "6", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "7", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "8", "</a>"], "</li>"],
+                         ["<li class=\"ellipsis\">", "", "</li>"], ["<li class=\"\">", ["<a>", "10", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "&gt;&gt;", "</a>"], "</li>"]], "</ul>"]}
+
+          HTML.pagination_links(conn(), %Page{entries: [], page_number: 3, page_size: 10, total_entries: 100, total_pages: 10}, [] , ellipsis: true)
+      end
     end
   end
 end
