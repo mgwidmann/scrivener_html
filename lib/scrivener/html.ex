@@ -152,13 +152,19 @@ defmodule Scrivener.HTML do
           if paginator.page_number == page_number do
             classes = ["active"]
           end
-          params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
-          content_tag :li, class: Enum.join(classes, " ") do
-            to = apply(path, args ++ [params_with_page])
-            if to do
-              link "#{text}", to: to
-            else
-              content_tag :a, "#{text}"
+          if text == :ellipsis do
+            content_tag(:li) do
+              [content_tag(:span, "&hellip;")]
+            end
+          else
+            params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
+            content_tag :li, class: Enum.join(classes, " ") do
+              to = apply(path, args ++ [params_with_page])
+              if to do
+                link "#{text}", to: to
+              else
+                content_tag :a, "#{text}"
+              end
             end
           end
         end)
@@ -176,13 +182,17 @@ defmodule Scrivener.HTML do
         if paginator.page_number == page_number do
           classes = ["active", "item"]
         end
-        params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
-        to = apply(path, args ++ [params_with_page])
-        class = Enum.join(classes, " ")
-        if to do
-          link "#{text}", to: apply(path, args ++ [params_with_page]), class: class
+        if text == :ellipsis do
+          content_tag(:div, "&hellip;", class: "disabled item")
         else
-          content_tag :a, "#{text}", class: class
+          params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
+          to = apply(path, args ++ [params_with_page])
+          class = Enum.join(classes, " ")
+          if to do
+            link "#{text}", to: apply(path, args ++ [params_with_page]), class: class
+          else
+            content_tag :a, "#{text}", class: class
+          end
         end
       end)
     end
@@ -198,17 +208,21 @@ defmodule Scrivener.HTML do
         if paginator.page_number == page_number do
           classes = ["current"]
         end
-        params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
-        to = apply(path, args ++ [params_with_page])
-        class = Enum.join(classes, " ")
-        content_tag :li, class: class do
-          if paginator.page_number == page_number do
-            content_tag :span, "#{text}"
-          else
-            if to do
-              link "#{text}", to: apply(path, args ++ [params_with_page])
+        if text == :ellipsis do
+          content_tag :li, "", class: "ellipsis"
+        else
+          params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
+          to = apply(path, args ++ [params_with_page])
+          class = Enum.join(classes, " ")
+          content_tag :li, class: class do
+            if paginator.page_number == page_number do
+              content_tag :span, "#{text}"
             else
-              content_tag :a, "#{text}"
+              if to do
+                link "#{text}", to: apply(path, args ++ [params_with_page])
+              else
+                content_tag :a, "#{text}"
+              end
             end
           end
         end
@@ -240,11 +254,13 @@ defmodule Scrivener.HTML do
     add_first(paginator.page_number, options[:distance], options[:first])
     |> add_previous(paginator.page_number)
     |> page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
+    |> add_ellipsis(paginator.page_number, paginator.total_pages, options[:distance], options[:ellipsis])
     |> add_last(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
     |> add_next(paginator.page_number, paginator.total_pages)
     |> Enum.map(fn
       :next -> if options[:next], do: {options[:next], paginator.page_number + 1}
       :previous -> if options[:previous], do: {options[:previous], paginator.page_number - 1}
+      :ellipsis -> if options[:ellipsis], do: {:ellipsis, paginator.page_number + 1}
       num -> {num, num}
     end) |> Enum.filter(&(&1))
   end
@@ -305,6 +321,12 @@ defmodule Scrivener.HTML do
     list
   end
 
+  defp add_ellipsis(list, page, total, distance, true) when page + distance < total do
+    list ++ [:ellipsis]
+  end
+  defp add_ellipsis(list, _page_number, _total, _distance, _false) do
+    list
+  end
 end
 
 # Must do this until Scrivener adds @derive [Enumerable, Access]
