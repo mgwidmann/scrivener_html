@@ -187,7 +187,7 @@ defmodule Scrivener.HTMLTest do
                         [["<li class=\"active\">", ["<a>", "1", "</a>"], "</li>"]],
                       "</ul>"],
                     "</nav>"]} =
-        HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
+        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
     end
   end
 
@@ -201,7 +201,7 @@ defmodule Scrivener.HTMLTest do
         assert {:safe, ["<div class=\"ui pagination menu\">",
                         [["<a class=\"active item\">", "1", "</a>"]],
                       "</div>"]} =
-          HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
+          HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
       end
     end
 
@@ -215,7 +215,7 @@ defmodule Scrivener.HTMLTest do
                         [["<li class=\"current\">", ["<span>", "1", "</span>"], "</li>"],
                          ["<li class=\"\">", ["<a>", "2", "</a>"], "</li>"],
                          ["<li class=\"\">", ["<a>", "&gt;&gt;", "</a>"], "</li>"]], "</ul>"]} =
-          HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 20, total_pages: 2})
+          HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 20, total_pages: 2})
       end
     end
   end

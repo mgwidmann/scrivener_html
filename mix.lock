@@ -4,9 +4,10 @@
   "ex_doc": {:hex, :ex_doc, "0.10.0"},
   "meck": {:hex, :meck, "0.8.4"},
   "pavlov": {:git, "https://github.com/sproutapp/pavlov.git", "7f3c0d7c75c8c2875e21b495511a291194bfc85a", []},
-  "phoenix": {:hex, :phoenix, "1.1.0"},
+  "phoenix": {:hex, :phoenix, "1.2.0-rc.0"},
   "phoenix_html": {:hex, :phoenix_html, "2.3.0"},
-  "plug": {:hex, :plug, "1.0.3"},
-  "poison": {:hex, :poison, "1.5.0"},
+  "phoenix_pubsub": {:hex, :phoenix_pubsub, "1.0.0-rc.0"},
+  "plug": {:hex, :plug, "1.1.4"},
+  "poison": {:hex, :poison, "1.5.2"},
   "poolboy": {:hex, :poolboy, "1.5.1"},
   "scrivener": {:hex, :scrivener, "1.0.0"}}
