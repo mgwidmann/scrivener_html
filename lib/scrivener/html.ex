@@ -328,10 +328,3 @@ defmodule Scrivener.HTML do
     list
   end
 end
-
-# Must do this until Scrivener adds @derive [Enumerable, Access]
-defimpl Enumerable, for: Scrivener.Page do
-  def reduce(pages, acc, fun), do: Enum.reduce(pages.entries || [], acc, fun)
-  def member?(pages, page), do: page in pages.entries
-  def count(pages), do: length(pages.entries)
-end
