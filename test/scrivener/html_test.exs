@@ -69,7 +69,7 @@ defmodule Scrivener.HTMLTest do
       end
 
       it "includes a previous before the first" do
-        assert [{"<<", 49}] ++ [{1, 1}] ++ pages(45..55) == links_with_opts [total_pages: 100, page_number: 50], previous: "<<", first: true
+        assert [{"<<", 49}, {1, 1}, {:ellipsis, "&hellip;"}] ++ pages(45..55) == links_with_opts [total_pages: 100, page_number: 50], previous: "<<", first: true
       end
 
       it "does not include previous when equal to page 1" do
@@ -184,7 +184,7 @@ defmodule Scrivener.HTMLTest do
 
       assert {:safe, ["<nav>",
                       ["<ul class=\"pagination\">",
-                        [["<li class=\"active\">", ["<a>", "1", "</a>"], "</li>"]],
+                        [["<li class=\"active\">", ["<a class=\"\">", "1", "</a>"], "</li>"]],
                       "</ul>"],
                     "</nav>"]} =
         HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
@@ -212,9 +212,9 @@ defmodule Scrivener.HTMLTest do
         Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
 
         assert {:safe, ["<ul class=\"pagination\" role=\"pagination\">",
-                        [["<li class=\"current\">", ["<span>", "1", "</span>"], "</li>"],
-                         ["<li class=\"\">", ["<a>", "2", "</a>"], "</li>"],
-                         ["<li class=\"\">", ["<a>", "&gt;&gt;", "</a>"], "</li>"]], "</ul>"]} =
+                        [["<li class=\"current\">", ["<span class=\"\">", "1", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "2", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "&gt;&gt;", "</span>"], "</li>"]], "</ul>"]} =
           HTML.pagination_links(conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 20, total_pages: 2})
       end
 
