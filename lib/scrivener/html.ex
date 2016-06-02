@@ -2,7 +2,7 @@ defmodule Scrivener.HTML do
   use Phoenix.HTML
   @defaults [view_style: :bootstrap, action: :index, page_param: :page]
   @view_styles [:bootstrap, :semantic, :foundation]
-  @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true]
+  @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true, ellipsis: "&hellip;"]
   @moduledoc """
   For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
 
@@ -147,27 +147,7 @@ defmodule Scrivener.HTML do
     content_tag :nav do
       content_tag :ul, class: "pagination" do
         raw_pagination_links(paginator, params)
-        |> Enum.map(fn ({text, page_number})->
-          classes = []
-          if paginator.page_number == page_number do
-            classes = ["active"]
-          end
-          if text == :ellipsis do
-            content_tag(:li) do
-              [content_tag(:span, "&hellip;")]
-            end
-          else
-            params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
-            content_tag :li, class: Enum.join(classes, " ") do
-              to = apply(path, args ++ [params_with_page])
-              if to do
-                link "#{text}", to: to
-              else
-                content_tag :a, "#{text}"
-              end
-            end
-          end
-        end)
+        |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :bootstrap))
       end
     end
   end
@@ -177,24 +157,7 @@ defmodule Scrivener.HTML do
     url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :div, class: "ui pagination menu" do
       raw_pagination_links(paginator, params)
-      |> Enum.map(fn({text, page_number}) ->
-        classes = ["item"]
-        if paginator.page_number == page_number do
-          classes = ["active", "item"]
-        end
-        if text == :ellipsis do
-          content_tag(:div, "&hellip;", class: "disabled item")
-        else
-          params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
-          to = apply(path, args ++ [params_with_page])
-          class = Enum.join(classes, " ")
-          if to do
-            link "#{text}", to: apply(path, args ++ [params_with_page]), class: class
-          else
-            content_tag :a, "#{text}", class: class
-          end
-        end
-      end)
+      |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :semantic))
     end
   end
 
@@ -203,32 +166,66 @@ defmodule Scrivener.HTML do
     url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
     content_tag :ul, class: "pagination", role: "pagination" do
       raw_pagination_links(paginator, params)
-      |> Enum.map(fn({text, page_number}) ->
-        classes = []
-        if paginator.page_number == page_number do
-          classes = ["current"]
-        end
-        if text == :ellipsis do
-          content_tag :li, "", class: "ellipsis"
-        else
-          params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
-          to = apply(path, args ++ [params_with_page])
-          class = Enum.join(classes, " ")
-          content_tag :li, class: class do
-            if paginator.page_number == page_number do
-              content_tag :span, "#{text}"
-            else
-              if to do
-                link "#{text}", to: apply(path, args ++ [params_with_page])
-              else
-                content_tag :a, "#{text}"
-              end
-            end
-          end
-        end
-      end)
+      |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :foundation))
     end
   end
+
+  defp page({:ellipsis, text}, _url_params, _page_param, _path, paginator, :semantic) do
+    content_tag(:div, text, class: link_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" "))
+  end
+  defp page({:ellipsis, text}, _url_params, _page_param, _path, paginator, style) do
+    content_tag(:li, class: li_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" ")) do
+      style
+      |> ellipsis_tag
+      |> content_tag(text, class: link_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" "))
+    end
+  end
+
+  defp page({text, page_number}, url_params, args, page_param, path, paginator, :semantic) do
+    params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
+    to = apply(path, args ++ [params_with_page])
+    if to do
+      link "#{text}", to: to, class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
+    else
+      content_tag :a, "#{text}", class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
+    end
+  end
+  defp page({text, page_number}, url_params, args, page_param, path, paginator, style) do
+    params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
+    content_tag :li, class: li_classes_for_style(paginator, page_number, style) |> Enum.join(" ") do
+      to = apply(path, args ++ [params_with_page])
+      if to do
+        link "#{text}", to: to, class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
+      else
+        style
+        |> blank_link_tag
+        |> content_tag("#{text}", class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
+      end
+    end
+  end
+
+  defp li_classes_for_style(_paginator, :ellipsis, :bootstrap), do: []
+  defp li_classes_for_style(paginator, page_number, :bootstrap) do
+    if(paginator.page_number == page_number, do: ["active"], else: [])
+  end
+  defp li_classes_for_style(_paginator, :ellipsis, :foundation), do: ["ellipsis"]
+  defp li_classes_for_style(paginator, page_number, :foundation) do
+    if(paginator.page_number == page_number, do: ["current"], else: [])
+  end
+  defp li_classes_for_style(_paginator, :ellipsis, :semantic), do: ["ellipsis"]
+  defp li_classes_for_style(paginator, page_number, :semantic) do
+    if(paginator.page_number == page_number, do: ["active", "item"], else: ["item"])
+  end
+
+  defp link_classes_for_style(_paginator, _page_number, :bootstrap), do: []
+  defp link_classes_for_style(_paginator, _page_number, :foundation), do: []
+  defp link_classes_for_style(_paginator, :ellipsis, :semantic), do: ["disabled", "item"]
+
+  defp ellipsis_tag(:semantic), do: :div
+  defp ellipsis_tag(_), do: :span
+
+  defp blank_link_tag(:foundation), do: :span
+  defp blank_link_tag(_), do: :a
 
   @doc """
   Returns the raw data in order to generate the proper HTML for pagination links. Data
@@ -252,15 +249,17 @@ defmodule Scrivener.HTML do
     options = Keyword.merge @raw_defaults, options
 
     add_first(paginator.page_number, options[:distance], options[:first])
+    |> add_first_ellipsis(paginator.page_number, paginator.total_pages, options[:distance])
     |> add_previous(paginator.page_number)
     |> page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
-    |> add_ellipsis(paginator.page_number, paginator.total_pages, options[:distance], options[:ellipsis])
+    |> add_last_ellipsis(paginator.page_number, paginator.total_pages, options[:distance])
     |> add_last(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
     |> add_next(paginator.page_number, paginator.total_pages)
     |> Enum.map(fn
       :next -> if options[:next], do: {options[:next], paginator.page_number + 1}
       :previous -> if options[:previous], do: {options[:previous], paginator.page_number - 1}
-      :ellipsis -> if options[:ellipsis], do: {:ellipsis, paginator.page_number + 1}
+      :first_ellipsis -> if options[:ellipsis] && options[:first], do: {:ellipsis, options[:ellipsis]}
+      :last_ellipsis -> if options[:ellipsis] && options[:last], do: {:ellipsis, options[:ellipsis]}
       num -> {num, num}
     end) |> Enum.filter(&(&1))
   end
@@ -321,10 +320,17 @@ defmodule Scrivener.HTML do
     list
   end
 
-  defp add_ellipsis(list, page, total, distance, true) when page + distance < total do
-    list ++ [:ellipsis]
+  defp add_first_ellipsis(list, page, total, distance) when page + distance < total do
+    list ++ [:first_ellipsis]
   end
-  defp add_ellipsis(list, _page_number, _total, _distance, _false) do
+  defp add_first_ellipsis(list, _page_number, _total, _distance) do
+    list
+  end
+
+  defp add_last_ellipsis(list, page, total, distance) when page - distance > 1 do
+    list ++ [:last_ellipsis]
+  end
+  defp add_last_ellipsis(list, _page_number, _total, _distance) do
     list
   end
 end
