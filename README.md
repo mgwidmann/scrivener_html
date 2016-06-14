@@ -16,14 +16,15 @@ Add to `mix.exs`
   end
 ```
 
-For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
+For use with Phoenix.HTML, configure the `:routes_helper` module in `config/config.exs`
+like the following:
 
 ```elixir
 config :scrivener_html,
   routes_helper: MyApp.Router.Helpers
 ```
 
-Import to you view.
+Import to your view.
 
 ```elixir
 defmodule MyApp.UserView do
@@ -41,6 +42,17 @@ Use in your template.
 ```
 
 Where `@page` is a `%Scrivener.Page{}` struct returned from `Repo.paginate/2`.
+So the function in your controller is like:
+
+```elixir
+#  params = %{"page" => _page}
+def index(conn, params) do
+  users = MyApp.User
+          # Other query conditions can be done here
+          |> MyApp.Repo.paginate(params)
+  render conn, :index, users: users
+end
+```
 
 If your resource has any url parameters to be supplied, you should provide them as the 3rd parameter. For example, given a scope like:
 
