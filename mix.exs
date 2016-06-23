@@ -45,7 +45,7 @@ defmodule ScrivenerHtml.Mixfile do
     [
       {:scrivener, "~> 1.2"},
       {:phoenix_html, "~> 2.2"},
-      {:phoenix, "~> 1.0 or ~> 1.2-rc", optional: true},
+      {:phoenix, "~> 1.0 or ~> 1.2", optional: true},
       {:pavlov, github: "sproutapp/pavlov", only: :test},
       {:ex_doc, "~> 0.10", only: :dev},
       {:earmark, "~> 0.1", only: :dev},
