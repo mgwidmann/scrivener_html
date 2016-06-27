@@ -127,6 +127,26 @@ defmodule Scrivener.HTMLTest do
       end
 
     end
+
+    describe "ellipsis" do
+
+      it "includes ellipsis after first" do
+        assert [{1, 1}, {:ellipsis, "&hellip;"}] ++ pages(45..55) == links_with_opts [total_pages: 100, page_number: 50], previous: false, first: true, ellipsis: "&hellip;"
+      end
+
+      it "includes ellipsis before last" do
+        assert pages(5..15) ++ [{:ellipsis, "&hellip;"}, {20, 20}] == links_with_opts [total_pages: 20, page_number: 10], last: true, ellipsis: "&hellip;"
+      end
+
+      it "does not include ellipsis on first page" do
+        assert pages(1..6) == links_with_opts [total_pages: 8, page_number: 1], first: true, ellipsis: "&hellip;"
+      end
+
+      it "does not include ellipsis on last page" do
+        assert pages(15..20) == links_with_opts [total_pages: 20, page_number: 20], last: true, ellipsis: "&hellip;"
+      end
+
+    end
   end
 
   describe "pagination_links" do

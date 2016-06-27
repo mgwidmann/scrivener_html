@@ -323,14 +323,14 @@ defmodule Scrivener.HTML do
     list
   end
 
-  defp add_first_ellipsis(list, page, total, distance) when page + distance < total do
+  defp add_first_ellipsis(list, page, total, distance) when page + distance < total and page > 1 do
     list ++ [:first_ellipsis]
   end
   defp add_first_ellipsis(list, _page_number, _total, _distance) do
     list
   end
 
-  defp add_last_ellipsis(list, page, total, distance) when page - distance > 1 do
+  defp add_last_ellipsis(list, page, total, distance) when page - distance > 1 and page != total do
     list ++ [:last_ellipsis]
   end
   defp add_last_ellipsis(list, _page_number, _total, _distance) do
