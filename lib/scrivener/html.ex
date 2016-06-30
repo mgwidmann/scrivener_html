@@ -173,10 +173,10 @@ defmodule Scrivener.HTML do
   defp page({:ellipsis, true}, url_params, args, page_param, path, paginator, style) do
     page({:ellipsis, unquote(@raw_defaults[:ellipsis])}, url_params, args, page_param, path, paginator, style)
   end
-  defp page({:ellipsis, text}, _url_params, args, _page_param, _path, paginator, :semantic) do
+  defp page({:ellipsis, text}, _url_params, _args, _page_param, _path, paginator, :semantic) do
     content_tag(:div, to_string(text), class: link_classes_for_style(paginator, :ellipsis, :semantic) |> Enum.join(" "))
   end
-  defp page({:ellipsis, text}, _url_params, args, _page_param, _path, paginator, style) do
+  defp page({:ellipsis, text}, _url_params, _args, _page_param, _path, paginator, style) do
     content_tag(:li, class: li_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" ")) do
       style
       |> ellipsis_tag
