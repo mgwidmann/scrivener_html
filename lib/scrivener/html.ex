@@ -174,13 +174,13 @@ defmodule Scrivener.HTML do
     page({:ellipsis, unquote(@raw_defaults[:ellipsis])}, url_params, args, page_param, path, paginator, style)
   end
   defp page({:ellipsis, text}, _url_params, args, _page_param, _path, paginator, :semantic) do
-    content_tag(:div, to_string(text), class: link_classes_for_style(paginator, :ellipsis, :semantic) |> Enum.join(" "))
+    content_tag(:div, {:safe, to_string(text)}, class: link_classes_for_style(paginator, :ellipsis, :semantic) |> Enum.join(" "))
   end
   defp page({:ellipsis, text}, _url_params, args, _page_param, _path, paginator, style) do
     content_tag(:li, class: li_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" ")) do
       style
       |> ellipsis_tag
-      |> content_tag(to_string(text), class: link_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" "))
+      |> content_tag({:safe, to_string(text)}, class: link_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" "))
     end
   end
 
@@ -323,14 +323,14 @@ defmodule Scrivener.HTML do
     list
   end
 
-  defp add_first_ellipsis(list, page, total, distance) when page + distance < total and page > 1 do
+  defp add_first_ellipsis(list, page, total, distance) when page - distance > 1 and page > 1 do
     list ++ [:first_ellipsis]
   end
   defp add_first_ellipsis(list, _page_number, _total, _distance) do
     list
   end
 
-  defp add_last_ellipsis(list, page, total, distance) when page - distance > 1 and page != total do
+  defp add_last_ellipsis(list, page, total, distance) when page + distance < total and page != total do
     list ++ [:last_ellipsis]
   end
   defp add_last_ellipsis(list, _page_number, _total, _distance) do
