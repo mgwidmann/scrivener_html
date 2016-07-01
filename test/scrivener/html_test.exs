@@ -254,12 +254,19 @@ defmodule Scrivener.HTMLTest do
         Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
 
         assert {:safe, ["<ul class=\"pagination\" role=\"pagination\">",
-                        [["<li class=\"\">", ["<a>", "&lt;&lt;", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "1", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "2", "</a>"], "</li>"],
-                         ["<li class=\"current\">", ["<span>", "3", "</span>"], "</li>"], ["<li class=\"\">", ["<a>", "4", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "5", "</a>"], "</li>"],
-                         ["<li class=\"\">", ["<a>", "6", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "7", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "8", "</a>"], "</li>"],
-                         ["<li class=\"ellipsis\">", "", "</li>"], ["<li class=\"\">", ["<a>", "10", "</a>"], "</li>"], ["<li class=\"\">", ["<a>", "&gt;&gt;", "</a>"], "</li>"]], "</ul>"]}
-
-          HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 3, page_size: 10, total_entries: 100, total_pages: 10}, [] , ellipsis: true)
+                        [["<li class=\"\">", ["<span class=\"\">", "&lt;&lt;", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "1", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "2", "</span>"], "</li>"],
+                         ["<li class=\"current\">", ["<span class=\"\">", "3", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "4", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "5", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "6", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "7", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "8", "</span>"], "</li>"],
+                         ["<li class=\"ellipsis\">", ["<span class=\"\">", "&hellip;", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "10", "</span>"], "</li>"],
+                         ["<li class=\"\">", ["<span class=\"\">", "&gt;&gt;", "</span>"], "</li>"]], "</ul>"]} ==
+          HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 3, page_size: 10, total_entries: 100, total_pages: 10}, [], ellipsis: true)
       end
     end
   end
