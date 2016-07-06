@@ -1,9 +1,10 @@
 defmodule ScrivenerHtml.Mixfile do
   use Mix.Project
 
+  @version "1.3.0"
   def project do
     [app: :scrivener_html,
-     version: "1.3.0",
+     version: @version,
      elixir: "~> 1.2",
      name: "scrivener_html",
      source_url: "git@github.com:mgwidmann/scrivener_html.git",
@@ -17,7 +18,8 @@ defmodule ScrivenerHtml.Mixfile do
        readme: "README.md"
      ],
      package: package,
-     deps: deps]
+     deps: deps,
+     aliases: aliases]
   end
 
   # Configuration for the OTP application
@@ -58,5 +60,15 @@ defmodule ScrivenerHtml.Mixfile do
       licenses: ["MIT"],
       links: %{github: "https://github.com/mgwidmann/scrivener_html"}
     ]
+  end
+
+  defp aliases do
+    [publish: ["hex.publish", "hex.docs", &tag_release/1]]
+  end
+
+  defp tag_release(_) do
+    Mix.shell.info "Tagging release as #{@version}"
+    System.cmd("git", ["-a", "v#{@version}", "-m", "v#{@version}"])
+    System.cmd("git", ["push", "--tags"])
   end
 end
