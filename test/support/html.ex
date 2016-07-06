@@ -1,7 +1,7 @@
 defmodule Scrivener.Support.HTML do
   alias Scrivener.HTML
 
-  def pages(range), do: Enum.to_list(range) |> Enum.map &({&1, &1})
+  def pages(range), do: Enum.to_list(range) |> Enum.map(&({&1, &1}))
   def pages_with_first(first, range), do: [{first, first}, {:ellipsis, "&hellip;"}] ++ pages(range)
   def pages_with_last(range, last), do: pages(range) ++ [{:ellipsis, "&hellip;"}, {last, last}]
   def pages_with_next(range, next), do: pages(range) ++ [{">>", next}]
