@@ -211,6 +211,27 @@ defmodule Scrivener.HTMLTest do
                     "</nav>"]} =
         HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
     end
+
+    test "allows other url parameters" do
+      use Phoenix.ConnTest
+      Application.put_env(:scrivener_html, :view_style, :bootstrap)
+      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
+
+      assert {:safe, ["<nav>",
+                      ["<ul class=\"pagination\">",
+                      [["<li class=\"active\">", ["<a class=\"\" href=\"/posts?url_param=param&page=1\">", "1", "</a>"], "</li>"],
+                       ["<li class=\"\">", ["<a class=\"\" href=\"/posts?url_param=param&page=2\">", "2", "</a>"], "</li>"],
+                       ["<li class=\"\">", ["<a class=\"\" href=\"/posts?url_param=param&page=3\">", "3", "</a>"], "</li>"],
+                       ["<li class=\"\">", ["<a class=\"\" href=\"/posts?url_param=param&page=4\">", "4", "</a>"], "</li>"],
+                       ["<li class=\"\">", ["<a class=\"\" href=\"/posts?url_param=param&page=5\">", "5", "</a>"], "</li>"],
+                       ["<li class=\"\">", ["<a class=\"\" href=\"/posts?url_param=param&page=6\">", "6", "</a>"], "</li>"],
+                       ["<li class=\"\">", ["<span class=\"\">", "&hellip;", "</span>"], "</li>"],
+                       ["<li class=\"\">", ["<a class=\"\" href=\"/posts?url_param=param&page=20\">", "20", "</a>"], "</li>"],
+                       ["<li class=\"\">", ["<a class=\"\" href=\"/posts?url_param=param&page=2\">", "&gt;&gt;", "</a>"], "</li>"]],
+                      "</ul>"],
+                    "</nav>"]} =
+        HTML.pagination_links(build_conn(), %Page{entries: [%{__struct__: Post, some: :object}], page_number: 1, page_size: 10, total_entries: 200, total_pages: 20}, url_param: "param")
+    end
   end
 
   describe "Semantic UI" do
