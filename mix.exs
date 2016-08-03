@@ -62,7 +62,7 @@ defmodule ScrivenerHtml.Mixfile do
   end
 
   defp aliases do
-    [publish: ["hex.publish", "hex.docs", &tag_release/1]]
+    [publish: ["hex.publish", "hex.publish docs", &tag_release/1]]
   end
 
   defp tag_release(_) do
