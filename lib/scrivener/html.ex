@@ -1,7 +1,7 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
   @defaults [view_style: :bootstrap, action: :index, page_param: :page]
-  @view_styles [:bootstrap, :semantic, :foundation]
+  @view_styles [:bootstrap, :semantic, :foundation, :bootstrap_v4]
   @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true, ellipsis: "&hellip;"]
   @moduledoc """
   For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
@@ -152,6 +152,17 @@ defmodule Scrivener.HTML do
     end
   end
 
+  # Bootstrap implementation
+  defp _pagination_links(paginator, [view_style: :bootstrap_v4, path: path, args: args, page_param: page_param, params: params]) do
+    url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
+    content_tag :nav, "aria-label": "Page navigation" do
+      content_tag :ul, class: "pagination" do
+        raw_pagination_links(paginator, params)
+        |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :bootstrap_v4))
+      end
+    end
+  end
+
   # Semantic UI implementation
   defp _pagination_links(paginator, [view_style: :semantic, path: path, args: args, page_param: page_param, params: params]) do
     url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
@@ -211,6 +222,11 @@ defmodule Scrivener.HTML do
   defp li_classes_for_style(paginator, page_number, :bootstrap) do
     if(paginator.page_number == page_number, do: ["active"], else: [])
   end
+
+  defp li_classes_for_style(_paginator, :ellipsis, :bootstrap_v4), do: ["page-item"]
+  defp li_classes_for_style(paginator, page_number, :bootstrap_v4) do
+    if(paginator.page_number == page_number, do: ["active", "page-item"], else: ["page-item"])
+  end
   defp li_classes_for_style(_paginator, :ellipsis, :foundation), do: ["ellipsis"]
   defp li_classes_for_style(paginator, page_number, :foundation) do
     if(paginator.page_number == page_number, do: ["current"], else: [])
@@ -221,6 +237,7 @@ defmodule Scrivener.HTML do
   end
 
   defp link_classes_for_style(_paginator, _page_number, :bootstrap), do: []
+  defp link_classes_for_style(_paginator, _page_number, :bootstrap_v4), do: ["page-link"]
   defp link_classes_for_style(_paginator, _page_number, :foundation), do: []
   defp link_classes_for_style(_paginator, :ellipsis, :semantic), do: ["disabled", "item"]
 

@@ -94,6 +94,8 @@ There are three view styles currently supported:
   by Foundation for Sites 6.x.
 - `:semantic` This styles the pagination links in a manner that is expected by
   Semantic UI 2.x.
+- `:bootstrap_v4` This styles the pagination links in a manner that
+  is expected by Bootstrap 4.x.
 
 For custom HTML output, see `Scrivener.HTML.raw_pagination_links/2`.
 
