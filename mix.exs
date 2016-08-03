@@ -62,12 +62,13 @@ defmodule ScrivenerHtml.Mixfile do
   end
 
   defp aliases do
-    [publish: ["hex.publish", "hex.publish docs", &tag_release/1]]
+    [publish: ["hex.publish", "hex.publish docs", "tag"],
+     tag: &tag_release/1]
   end
 
   defp tag_release(_) do
     Mix.shell.info "Tagging release as #{@version}"
-    System.cmd("git", ["-a", "v#{@version}", "-m", "v#{@version}"])
+    System.cmd("git", ["tag", "-a", "v#{@version}", "-m", "v#{@version}"])
     System.cmd("git", ["push", "--tags"])
   end
 end
