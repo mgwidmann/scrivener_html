@@ -7,10 +7,20 @@ Helpers built to work with [Scrivener](https://github.com/drewolson/scrivener)'s
 Add to `mix.exs`
 
 ```elixir
+  # add :scrivener_html to deps
   defp deps do
     [
       # ...
       {:scrivener_html, "~> 1.1"}
+      # ...
+    ]
+  end
+
+  # add :scrivener_html to applications list
+  defp application do
+    [
+      # ...
+      applications: [ ..., :scrivener_html, ... ]
       # ...
     ]
   end
