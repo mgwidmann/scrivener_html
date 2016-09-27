@@ -64,6 +64,8 @@ def index(conn, params) do
 end
 ```
 
+### Scopes and URL Parameters
+
 If your resource has any url parameters to be supplied, you should provide them as the 3rd parameter. For example, given a scope like:
 
 ```elixir
@@ -80,12 +82,22 @@ You would need to pass in the `:locale` parameter and `:path` option like so:
 <%= pagination_links @conn, @page, ["en"], path: &page_path/4 %>
 ```
 
+#### Query String Parameters
+
 Any additional query string parameters can be passed in as well.
 
 ```elixir
 <%= pagination_links @conn, @page, ["en"], some_parameter: "data" %>
 <%# OR IF NO URL PARAMETERS %>
 <%= pagination_links @conn, @page, some_parameter: "data" %>
+```
+
+### Custom Actions
+
+If you need to hit a different action other than `:index`, simply pass the action name to use in the url helper.
+
+```elixir
+<%= pagination_links @conn, @page, action: :show %>
 ```
 
 ## Customizing Output
