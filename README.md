@@ -72,14 +72,21 @@ If your resource has any url parameters to be supplied, you should provide them 
 scope "/:locale", App do
   pipe_through [:browser]
 
-  get "/page", PageController, :index
+  get "/page", PageController, :index, as: :pages
+  get "/pages/:id", PageController, :show, as: :page
 end
 ```
 
 You would need to pass in the `:locale` parameter and `:path` option like so:
 
 ```elixir
-<%= pagination_links @conn, @page, ["en"], path: &page_path/4 %>
+<%= pagination_links @conn, @page, ["en"], path: &pages_path/4 %>
+```
+
+With a nested resource, simply add it to the list:
+
+```elixir
+<%= pagination_links @conn, @page, ["en", @page_id], path: &page_path/4, action: :show %>
 ```
 
 #### Query String Parameters
