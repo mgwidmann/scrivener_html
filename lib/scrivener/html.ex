@@ -2,7 +2,7 @@ defmodule Scrivener.HTML do
   use Phoenix.HTML
   @defaults [view_style: :bootstrap, action: :index, page_param: :page]
   @view_styles [:bootstrap, :semantic, :foundation, :bootstrap_v4]
-  @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true, ellipsis: "&hellip;"]
+  @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true, ellipsis: raw("&hellip;")]
   @moduledoc """
   For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
 
@@ -185,13 +185,13 @@ defmodule Scrivener.HTML do
     page({:ellipsis, unquote(@raw_defaults[:ellipsis])}, url_params, args, page_param, path, paginator, style)
   end
   defp page({:ellipsis, text}, _url_params, _args, _page_param, _path, paginator, :semantic) do
-    content_tag(:div, {:safe, to_string(text)}, class: link_classes_for_style(paginator, :ellipsis, :semantic) |> Enum.join(" "))
+    content_tag(:div, safe(text), class: link_classes_for_style(paginator, :ellipsis, :semantic) |> Enum.join(" "))
   end
   defp page({:ellipsis, text}, _url_params, _args, _page_param, _path, paginator, style) do
     content_tag(:li, class: li_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" ")) do
       style
       |> ellipsis_tag
-      |> content_tag({:safe, to_string(text)}, class: link_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" "))
+      |> content_tag(safe(text), class: link_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" "))
     end
   end
 
@@ -199,9 +199,9 @@ defmodule Scrivener.HTML do
     params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
     to = apply(path, args ++ [params_with_page])
     if to do
-      link "#{text}", to: to, class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
+      link(safe(text), to: to, class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
     else
-      content_tag :a, "#{text}", class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
+      content_tag :a, safe(text), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
     end
   end
   defp page({text, page_number}, url_params, args, page_param, path, paginator, style) do
@@ -209,11 +209,11 @@ defmodule Scrivener.HTML do
     content_tag :li, class: li_classes_for_style(paginator, page_number, style) |> Enum.join(" ") do
       to = apply(path, args ++ [params_with_page])
       if to do
-        link "#{text}", to: to, class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
+        link(safe(text), to: to, class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
       else
         style
-        |> blank_link_tag
-        |> content_tag("#{text}", class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
+        |> blank_link_tag()
+        |> content_tag(safe(text), class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
       end
     end
   end
@@ -352,5 +352,17 @@ defmodule Scrivener.HTML do
   end
   defp add_last_ellipsis(list, _page_number, _total, _distance) do
     list
+  end
+
+  defp safe({:safe, _string} = whole_string) do
+    whole_string
+  end
+  defp safe(string) when is_binary(string) do
+    string
+  end
+  defp safe(string) do
+    string
+    |> to_string()
+    |> raw()
   end
 end

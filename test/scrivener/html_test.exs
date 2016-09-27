@@ -68,7 +68,7 @@ defmodule Scrivener.HTMLTest do
     end
 
     test "includes a previous before the first" do
-      assert [{"<<", 49}, {1, 1}, {:ellipsis, "&hellip;"}] ++ pages(45..55) == links_with_opts [total_pages: 100, page_number: 50], previous: "<<", first: true
+      assert [{"<<", 49}, {1, 1}, {:ellipsis, Phoenix.HTML.raw("&hellip;")}] ++ pages(45..55) == links_with_opts [total_pages: 100, page_number: 50], previous: "<<", first: true
     end
 
     test "does not include previous when equal to page 1" do
@@ -195,6 +195,20 @@ defmodule Scrivener.HTMLTest do
     test "accepts an override page param name" do
       html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, page_param: :custom_pp)
       assert Phoenix.HTML.safe_to_string(html) =~ ~r(custom_pp=2)
+    end
+
+    test "allows unicode" do
+      html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, previous: "«")
+      assert Phoenix.HTML.safe_to_string(html) == """
+      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\">«</a></li><li class=\"\"><a class=\"\" href=\"?page=1\">1</a></li><li class=\"active\"><a class=\"\" href=\"?page=2\">2</a></li></ul></nav>
+      """ |> String.trim_trailing
+    end
+
+    test "allows using raw" do
+      html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, previous: Phoenix.HTML.raw("&leftarrow;"))
+      assert Phoenix.HTML.safe_to_string(html) == """
+      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\">&leftarrow;</a></li><li class=\"\"><a class=\"\" href=\"?page=1\">1</a></li><li class=\"active\"><a class=\"\" href=\"?page=2\">2</a></li></ul></nav>
+      """ |> String.trim_trailing
     end
   end
 
