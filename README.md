@@ -96,6 +96,12 @@ Below are the defaults which are used without passing in any options.
 <%= pagination_links @conn, @page, distance: 5, next: ">>", previous: "<<", first: true, last: true, view_style: :bootstrap %>
 ```
 
+To prevent HTML escaping (i.e. seeing things like `&lt;` on the page), simply use `Phoenix.HTML.raw/1` for any `&amp;` strings passed in, like so:
+
+```elixir
+<%= pagination_links @conn, @page, previous: Phoenix.HTML.raw("&leftarrow;"), next: Phoenix.HTML.raw("&rightarrow;") %>
+```
+
 There are three view styles currently supported:
 
 - `:bootstrap` (the default) This styles the pagination links in a manner that
