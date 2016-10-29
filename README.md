@@ -48,7 +48,7 @@ end
 Use in your template.
 
 ```elixir
-<%= pagination_links @conn, @page %>
+<%= pagination_links @page %>
 ```
 
 Where `@page` is a `%Scrivener.Page{}` struct returned from `Repo.paginate/2`.
@@ -80,13 +80,13 @@ end
 You would need to pass in the `:locale` parameter and `:path` option like so:
 
 ```elixir
-<%= pagination_links @conn, @page, ["en"], path: &pages_path/4 %>
+<%= pagination_links @page, ["en"], path: &pages_path/4 %>
 ```
 
 With a nested resource, simply add it to the list:
 
 ```elixir
-<%= pagination_links @conn, @page, ["en", @page_id], path: &page_path/4, action: :show %>
+<%= pagination_links @page, ["en", @page_id], path: &page_path/4, action: :show %>
 ```
 
 #### Query String Parameters
@@ -94,9 +94,9 @@ With a nested resource, simply add it to the list:
 Any additional query string parameters can be passed in as well.
 
 ```elixir
-<%= pagination_links @conn, @page, ["en"], some_parameter: "data" %>
+<%= pagination_links @page, ["en"], some_parameter: "data" %>
 <%# OR IF NO URL PARAMETERS %>
-<%= pagination_links @conn, @page, some_parameter: "data" %>
+<%= pagination_links @page, some_parameter: "data" %>
 ```
 
 ### Custom Actions
@@ -104,7 +104,7 @@ Any additional query string parameters can be passed in as well.
 If you need to hit a different action other than `:index`, simply pass the action name to use in the url helper.
 
 ```elixir
-<%= pagination_links @conn, @page, action: :show %>
+<%= pagination_links @page, action: :show %>
 ```
 
 ## Customizing Output
@@ -112,13 +112,13 @@ If you need to hit a different action other than `:index`, simply pass the actio
 Below are the defaults which are used without passing in any options.
 
 ```elixir
-<%= pagination_links @conn, @page, distance: 5, next: ">>", previous: "<<", first: true, last: true, view_style: :bootstrap %>
+<%= pagination_links @page, distance: 5, next: ">>", previous: "<<", first: true, last: true, view_style: :bootstrap %>
 ```
 
 To prevent HTML escaping (i.e. seeing things like `&lt;` on the page), simply use `Phoenix.HTML.raw/1` for any `&amp;` strings passed in, like so:
 
 ```elixir
-<%= pagination_links @conn, @page, previous: Phoenix.HTML.raw("&leftarrow;"), next: Phoenix.HTML.raw("&rightarrow;") %>
+<%= pagination_links @page, previous: Phoenix.HTML.raw("&leftarrow;"), next: Phoenix.HTML.raw("&rightarrow;") %>
 ```
 
 There are three view styles currently supported:
