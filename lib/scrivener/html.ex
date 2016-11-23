@@ -37,7 +37,7 @@ defmodule Scrivener.HTML do
     resolution cannot be performed.
     """
     def path(_conn, :index, opts) do
-      "?" <> Plug.Conn.Query.encode(opts)
+      ("?" <> Plug.Conn.Query.encode(opts))
     end
   end
 
