@@ -37,9 +37,7 @@ defmodule Scrivener.HTML do
     resolution cannot be performed.
     """
     def path(_conn, :index, opts) do
-      Enum.reduce opts, "?", fn {k, v}, s ->
-        "#{s}#{if(s == "?", do: "", else: "&")}#{k}=#{v}"
-      end
+      ("?" <> Plug.Conn.Query.encode(opts))
     end
   end
 
