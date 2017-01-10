@@ -17,9 +17,9 @@ defmodule ScrivenerHtml.Mixfile do
        main: Scrivener.HTML,
        readme: "README.md"
      ],
-     package: package,
-     deps: deps,
-     aliases: aliases]
+     package: package(),
+     deps: deps(),
+     aliases: aliases()]
   end
 
   # Configuration for the OTP application
