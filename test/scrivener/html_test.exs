@@ -172,7 +172,7 @@ defmodule Scrivener.HTMLTest do
 
     test "uses application config" do
       Application.put_env(:scrivener_html, :view_style, :another_style)
-      assert_raise RuntimeError, "Scrivener.HTML: View style :another_style is not a valid view style. Please use one of [:bootstrap, :semantic, :foundation, :bootstrap_v4]", fn ->
+      assert_raise RuntimeError, "Scrivener.HTML: View style :another_style is not a valid view style. Please use one of [:bootstrap, :semantic, :foundation, :bootstrap_v4, :bulma]", fn ->
         HTML.pagination_links(%Page{total_pages: 10, page_number: 5})
       end
     end
@@ -310,6 +310,20 @@ defmodule Scrivener.HTMLTest do
       assert {:safe, ["<nav aria-label=\"Page navigation\">",
                       ["<ul class=\"pagination\">",
                        [["<li class=\"active page-item\">", ["<a class=\"page-link\">", "1", "</a>"], "</li>"]],
+                       "</ul>"], "</nav>"]} =
+        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
+    end
+  end
+
+  describe "Bulma" do
+    test "renders bulma styling" do
+      use Phoenix.ConnTest
+      Application.put_env(:scrivener_html, :view_style, :bulma)
+      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
+
+      assert {:safe, ["<nav class=\"pagination\">",
+                      ["<ul>",
+                       [["<li class=\"\">", ["<a class=\"button is-primary\">", "1", "</a>"], "</li>"]],
                        "</ul>"], "</nav>"]} =
         HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
     end

@@ -1,7 +1,7 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
   @defaults [view_style: :bootstrap, action: :index, page_param: :page]
-  @view_styles [:bootstrap, :semantic, :foundation, :bootstrap_v4]
+  @view_styles [:bootstrap, :semantic, :foundation, :bootstrap_v4, :bulma]
   @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true, ellipsis: raw("&hellip;")]
   @moduledoc """
   For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
@@ -179,6 +179,17 @@ defmodule Scrivener.HTML do
     end
   end
 
+  # Bulma implementation
+  defp _pagination_links(paginator, [view_style: :bulma, path: path, args: args, page_param: page_param, params: params]) do
+    url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
+    content_tag :nav, class: "pagination" do
+      content_tag :ul do
+        raw_pagination_links(paginator, params)
+        |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :bulma))
+      end
+    end
+  end
+
   defp page({:ellipsis, true}, url_params, args, page_param, path, paginator, style) do
     page({:ellipsis, unquote(@raw_defaults[:ellipsis])}, url_params, args, page_param, path, paginator, style)
   end
@@ -225,19 +236,29 @@ defmodule Scrivener.HTML do
   defp li_classes_for_style(paginator, page_number, :bootstrap_v4) do
     if(paginator.page_number == page_number, do: ["active", "page-item"], else: ["page-item"])
   end
+
   defp li_classes_for_style(_paginator, :ellipsis, :foundation), do: ["ellipsis"]
   defp li_classes_for_style(paginator, page_number, :foundation) do
     if(paginator.page_number == page_number, do: ["current"], else: [])
   end
+
   defp li_classes_for_style(_paginator, :ellipsis, :semantic), do: ["ellipsis"]
   defp li_classes_for_style(paginator, page_number, :semantic) do
     if(paginator.page_number == page_number, do: ["active", "item"], else: ["item"])
   end
 
+  defp li_classes_for_style(_paginator, :ellipsis, :bulma), do: []
+  defp li_classes_for_style(paginator, page_number, :bulma), do: []
+
+
+
   defp link_classes_for_style(_paginator, _page_number, :bootstrap), do: []
   defp link_classes_for_style(_paginator, _page_number, :bootstrap_v4), do: ["page-link"]
   defp link_classes_for_style(_paginator, _page_number, :foundation), do: []
   defp link_classes_for_style(_paginator, :ellipsis, :semantic), do: ["disabled", "item"]
+  defp link_classes_for_style(paginator, page_number, :bulma) do
+    if(paginator.page_number == page_number, do: ["button", "is-primary"], else: ["button"])
+  end
 
   defp ellipsis_tag(:semantic), do: :div
   defp ellipsis_tag(_), do: :span
