@@ -172,7 +172,7 @@ defmodule Scrivener.HTMLTest do
 
     test "uses application config" do
       Application.put_env(:scrivener_html, :view_style, :another_style)
-      assert_raise RuntimeError, "Scrivener.HTML: View style :another_style is not a valid view style. Please use one of [:bootstrap, :semantic, :foundation, :bootstrap_v4]", fn ->
+      assert_raise RuntimeError, "Scrivener.HTML: View style :another_style is not a valid view style. Please use one of [:bootstrap, :semantic, :foundation, :bootstrap_v4, :materialize]", fn ->
         HTML.pagination_links(%Page{total_pages: 10, page_number: 5})
       end
     end
@@ -314,4 +314,20 @@ defmodule Scrivener.HTMLTest do
         HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
     end
   end
+
+    describe "Materialize css" do
+    test "renders materialize css styling" do
+      use Phoenix.ConnTest
+      Application.put_env(:scrivener_html, :view_style, :materialize)
+      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
+
+      assert {:safe, ["<ul class=\"pagination\">",
+                       [["<li class=\"active\">", ["<a class=\"\">", "1", "</a>"], "</li>"],
+                        ["<li class=\"waves-effect\">", ["<a class=\"\">", "2", "</a>"], "</li>"],
+                        ["<li class=\"waves-effect\">", ["<a class=\"\">", "&gt;&gt;", "</a>"], "</li>"]],
+                      "</ul>"]} ==
+        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 2, total_pages: 2})
+    end
+  end
+
 end

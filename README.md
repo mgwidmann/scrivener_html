@@ -121,7 +121,7 @@ To prevent HTML escaping (i.e. seeing things like `&lt;` on the page), simply us
 <%= pagination_links @page, previous: Phoenix.HTML.raw("&leftarrow;"), next: Phoenix.HTML.raw("&rightarrow;") %>
 ```
 
-There are three view styles currently supported:
+There are five view styles currently supported:
 
 - `:bootstrap` (the default) This styles the pagination links in a manner that
   is expected by Bootstrap 3.x.
@@ -131,6 +131,8 @@ There are three view styles currently supported:
   Semantic UI 2.x.
 - `:bootstrap_v4` This styles the pagination links in a manner that
   is expected by Bootstrap 4.x.
+- `:materialize` This styles the pagination links in a manner that
+  is expected by Materialize css 0.x.
 
 For custom HTML output, see `Scrivener.HTML.raw_pagination_links/2`.
 
