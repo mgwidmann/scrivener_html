@@ -1,7 +1,7 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
   @defaults [view_style: :bootstrap, action: :index, page_param: :page]
-  @view_styles [:bootstrap, :semantic, :foundation, :bootstrap_v4]
+  @view_styles [:bootstrap, :semantic, :foundation, :bootstrap_v4, :materialize]
   @raw_defaults [distance: 5, next: ">>", previous: "<<", first: true, last: true, ellipsis: raw("&hellip;")]
   @moduledoc """
   For use with Phoenix.HTML, configure the `:routes_helper` module like the following:
@@ -179,6 +179,15 @@ defmodule Scrivener.HTML do
     end
   end
 
+  # Materialized implementation
+  defp _pagination_links(paginator, [view_style: :materialize, path: path, args: args, page_param: page_param, params: params]) do
+    url_params = Keyword.drop params, Keyword.keys(@raw_defaults)
+    content_tag :ul, class: "pagination" do
+      raw_pagination_links(paginator, params)
+      |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :materialize))
+    end
+  end
+
   defp page({:ellipsis, true}, url_params, args, page_param, path, paginator, style) do
     page({:ellipsis, unquote(@raw_defaults[:ellipsis])}, url_params, args, page_param, path, paginator, style)
   end
@@ -233,11 +242,17 @@ defmodule Scrivener.HTML do
   defp li_classes_for_style(paginator, page_number, :semantic) do
     if(paginator.page_number == page_number, do: ["active", "item"], else: ["item"])
   end
+  defp li_classes_for_style(_paginator, :ellipsis, :materialize), do: []
+  defp li_classes_for_style(paginator, page_number, :materialize) do
+    if(paginator.page_number == page_number, do: ["active"], else: ["waves-effect"])
+  end
 
   defp link_classes_for_style(_paginator, _page_number, :bootstrap), do: []
   defp link_classes_for_style(_paginator, _page_number, :bootstrap_v4), do: ["page-link"]
   defp link_classes_for_style(_paginator, _page_number, :foundation), do: []
+  defp link_classes_for_style(_paginator, _page_number, :materialize), do: []
   defp link_classes_for_style(_paginator, :ellipsis, :semantic), do: ["disabled", "item"]
+  defp link_classes_for_style(_paginator, :ellipsis, :materialize), do: []
 
   defp ellipsis_tag(:semantic), do: :div
   defp ellipsis_tag(_), do: :span
