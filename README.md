@@ -48,6 +48,10 @@ end
 Use in your template.
 
 ```elixir
+<%= for user <- @page.entries do %>
+   ...
+<% end %>
+
 <%= pagination_links @page %>
 ```
 
@@ -57,10 +61,10 @@ So the function in your controller is like:
 ```elixir
 #  params = %{"page" => _page}
 def index(conn, params) do
-  users = MyApp.User
+  page = MyApp.User
           # Other query conditions can be done here
           |> MyApp.Repo.paginate(params)
-  render conn, :index, users: users
+  render conn, :index, page: page
 end
 ```
 
