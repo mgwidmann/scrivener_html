@@ -146,6 +146,13 @@ defmodule Scrivener.HTMLTest do
       assert [{1, 1}, {:ellipsis, "&hellip;"}] ++ pages(2..12) == links_with_opts [total_pages: 20, page_number: 7], first: true, ellipsis: "&hellip;"
     end
 
+    test "when first/last are true, uses ellipsis only when (<distance> + 1) is greater than the total pages" do
+      options = [first: true, last: true, distance: 1]
+
+      assert pages(1..3) == links_with_opts [total_pages: 3, page_number: 1], options
+      assert pages(1..3) == links_with_opts [total_pages: 3, page_number: 3], options
+    end
+
     test "does not include ellipsis on last page" do
       assert pages(15..20) == links_with_opts [total_pages: 20, page_number: 20], last: true, ellipsis: "&hellip;"
     end
