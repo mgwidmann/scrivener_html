@@ -282,10 +282,10 @@ defmodule Scrivener.HTML do
     options = Keyword.merge @raw_defaults, options
 
     add_first(paginator.page_number, options[:distance], options[:first])
-    |> add_first_ellipsis(paginator.page_number, paginator.total_pages, options[:distance])
+    |> add_first_ellipsis(paginator.page_number, paginator.total_pages, options[:distance], options[:first])
     |> add_previous(paginator.page_number)
     |> page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
-    |> add_last_ellipsis(paginator.page_number, paginator.total_pages, options[:distance])
+    |> add_last_ellipsis(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
     |> add_last(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
     |> add_next(paginator.page_number, paginator.total_pages)
     |> Enum.map(fn
@@ -353,17 +353,25 @@ defmodule Scrivener.HTML do
     list
   end
 
-  defp add_first_ellipsis(list, page, _total, distance) when page - distance > 1 and page > 1 do
+  defp add_first_ellipsis(list, page, total, distance, true) do
+    add_first_ellipsis(list, page,total, distance + 1, nil)
+  end
+
+  defp add_first_ellipsis(list, page, _total, distance, _first) when page - distance > 1 and page > 1 do
     list ++ [:first_ellipsis]
   end
-  defp add_first_ellipsis(list, _page_number, _total, _distance) do
+  defp add_first_ellipsis(list, _page_number, _total, _distance, _first) do
     list
   end
 
-  defp add_last_ellipsis(list, page, total, distance) when page + distance < total and page != total do
+  defp add_last_ellipsis(list, page, total, distance, true) do
+    add_last_ellipsis(list, page, total, distance + 1, nil)
+  end
+
+  defp add_last_ellipsis(list, page, total, distance, _) when page + distance < total and page != total do
     list ++ [:last_ellipsis]
   end
-  defp add_last_ellipsis(list, _page_number, _total, _distance) do
+  defp add_last_ellipsis(list, _page_number, _total, _distance, _last) do
     list
   end
 
