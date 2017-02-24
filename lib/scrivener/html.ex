@@ -281,16 +281,18 @@ defmodule Scrivener.HTML do
   def raw_pagination_links(paginator, options \\ []) do
     options = Keyword.merge @raw_defaults, options
 
-    add_first(paginator.page_number, options[:distance], options[:first])
-    |> add_first_ellipsis(paginator.page_number, paginator.total_pages, options[:distance], options[:first])
-    |> add_previous(paginator.page_number)
-    |> page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
-    |> add_last_ellipsis(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
-    |> add_last(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
-    |> add_next(paginator.page_number, paginator.total_pages)
+    page_number = Enum.min([paginator.total_pages, paginator.page_number])
+
+    add_first(page_number, options[:distance], options[:first])
+    |> add_first_ellipsis(page_number, paginator.total_pages, options[:distance], options[:first])
+    |> add_previous(page_number)
+    |> page_number_list(page_number, paginator.total_pages, options[:distance])
+    |> add_last_ellipsis(page_number, paginator.total_pages, options[:distance], options[:last])
+    |> add_last(page_number, paginator.total_pages, options[:distance], options[:last])
+    |> add_next(page_number, paginator.total_pages)
     |> Enum.map(fn
-      :next -> if options[:next], do: {options[:next], paginator.page_number + 1}
-      :previous -> if options[:previous], do: {options[:previous], paginator.page_number - 1}
+      :next -> if options[:next], do: {options[:next], page_number + 1}
+      :previous -> if options[:previous], do: {options[:previous], page_number - 1}
       :first_ellipsis -> if options[:ellipsis] && options[:first], do: {:ellipsis, options[:ellipsis]}
       :last_ellipsis -> if options[:ellipsis] && options[:last], do: {:ellipsis, options[:ellipsis]}
       num -> {num, num}
