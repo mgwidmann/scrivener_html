@@ -281,18 +281,16 @@ defmodule Scrivener.HTML do
   def raw_pagination_links(paginator, options \\ []) do
     options = Keyword.merge @raw_defaults, options
 
-    page_number = Enum.min([paginator.total_pages, paginator.page_number])
-
-    add_first(page_number, options[:distance], options[:first])
-    |> add_first_ellipsis(page_number, paginator.total_pages, options[:distance], options[:first])
-    |> add_previous(page_number)
-    |> page_number_list(page_number, paginator.total_pages, options[:distance])
-    |> add_last_ellipsis(page_number, paginator.total_pages, options[:distance], options[:last])
-    |> add_last(page_number, paginator.total_pages, options[:distance], options[:last])
-    |> add_next(page_number, paginator.total_pages)
+    add_first(paginator.page_number, options[:distance], options[:first])
+    |> add_first_ellipsis(paginator.page_number, paginator.total_pages, options[:distance], options[:first])
+    |> add_previous(paginator.page_number)
+    |> page_number_list(paginator.page_number, paginator.total_pages, options[:distance])
+    |> add_last_ellipsis(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
+    |> add_last(paginator.page_number, paginator.total_pages, options[:distance], options[:last])
+    |> add_next(paginator.page_number, paginator.total_pages)
     |> Enum.map(fn
-      :next -> if options[:next], do: {options[:next], page_number + 1}
-      :previous -> if options[:previous], do: {options[:previous], page_number - 1}
+      :next -> if options[:next], do: {options[:next], paginator.page_number + 1}
+      :previous -> if options[:previous], do: {options[:previous], paginator.page_number - 1}
       :first_ellipsis -> if options[:ellipsis] && options[:first], do: {:ellipsis, options[:ellipsis]}
       :last_ellipsis -> if options[:ellipsis] && options[:last], do: {:ellipsis, options[:ellipsis]}
       num -> {num, num}
@@ -301,26 +299,32 @@ defmodule Scrivener.HTML do
 
   # Computing page number ranges
   defp page_number_list(list, page, total, distance) when is_integer(distance) and distance >= 1 do
-    list ++ Enum.to_list(beginning_distance(page, distance)..end_distance(page, total, distance))
+    list ++ Enum.to_list(beginning_distance(page, total, distance)..end_distance(page, total, distance))
   end
   defp page_number_list(_list, _page, _total, _distance) do
     raise "Scrivener.HTML: Distance cannot be less than one."
   end
 
   # Beginning distance computation
-  defp beginning_distance(page, distance) when page - distance < 1 do
+  # defp beginning_distance(page, total, distance) when page + distance > total and page < total do
+  #   page - distance
+  # end
+  defp beginning_distance(page, _total, distance) when page - distance < 1 do
     page - (distance + (page - distance - 1))
   end
-  defp beginning_distance(page, distance) do
+  defp beginning_distance(page, total, distance) when page <= total  do
     page - distance
+  end
+  defp beginning_distance(page, total, distance) when page > total do
+    total - distance
   end
 
   # End distance computation
-  defp end_distance(page, 0, _distance) do
-    page
-  end
-  defp end_distance(page, total, distance) when page + distance >= total do
+  defp end_distance(page, total, distance) when page + distance >= total and total != 0 do
     total
+  end
+  defp end_distance(page, 0, _distance) do
+    1
   end
   defp end_distance(page, _total, distance) do
     page + distance
