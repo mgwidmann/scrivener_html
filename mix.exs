@@ -1,7 +1,7 @@
 defmodule ScrivenerHtml.Mixfile do
   use Mix.Project
 
-  @version "1.5.1"
+  @version "1.6.0"
   def project do
     [app: :scrivener_html,
      version: @version,
