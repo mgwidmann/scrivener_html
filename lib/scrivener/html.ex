@@ -306,27 +306,30 @@ defmodule Scrivener.HTML do
   end
 
   # Beginning distance computation
-  # defp beginning_distance(page, total, distance) when page + distance > total and page < total do
-  #   page - distance
-  # end
+  # For low page numbers
   defp beginning_distance(page, _total, distance) when page - distance < 1 do
     page - (distance + (page - distance - 1))
   end
+  # For medium to high end page numbers
   defp beginning_distance(page, total, distance) when page <= total  do
     page - distance
   end
+  # For page numbers over the total number of pages (prevent DOS attack generating too many pages)
   defp beginning_distance(page, total, distance) when page > total do
     total - distance
   end
 
   # End distance computation
+  # For high end page numbers (prevent DOS attack generating too many pages)
   defp end_distance(page, total, distance) when page + distance >= total and total != 0 do
     total
   end
+  # For when there is no pages, cannot trust page number because it is supplied by user potentially (prevent DOS attack)
   defp end_distance(page, 0, _distance) do
     1
   end
-  defp end_distance(page, _total, distance) do
+  # For low to mid range page numbers (guard here to ensure crash if something goes wrong)
+  defp end_distance(page, total, distance) when page + distance < total do
     page + distance
   end
 
