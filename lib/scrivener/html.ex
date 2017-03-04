@@ -325,7 +325,7 @@ defmodule Scrivener.HTML do
     total
   end
   # For when there is no pages, cannot trust page number because it is supplied by user potentially (prevent DOS attack)
-  defp end_distance(page, 0, _distance) do
+  defp end_distance(_page, 0, _distance) do
     1
   end
   # For low to mid range page numbers (guard here to ensure crash if something goes wrong)
