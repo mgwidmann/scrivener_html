@@ -43,6 +43,10 @@ defmodule Scrivener.HTMLTest do
       assert pages(5..10) == links_with_opts total_pages: 10, page_number: 10
     end
 
+    test "page value larger than total pages" do
+      assert pages(5..10) == links_with_opts total_pages: 10, page_number: 100
+    end
+
   end
 
   describe "raw_pagination_links next" do

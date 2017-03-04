@@ -299,26 +299,32 @@ defmodule Scrivener.HTML do
 
   # Computing page number ranges
   defp page_number_list(list, page, total, distance) when is_integer(distance) and distance >= 1 do
-    list ++ Enum.to_list(beginning_distance(page, distance)..end_distance(page, total, distance))
+    list ++ Enum.to_list(beginning_distance(page, total, distance)..end_distance(page, total, distance))
   end
   defp page_number_list(_list, _page, _total, _distance) do
     raise "Scrivener.HTML: Distance cannot be less than one."
   end
 
   # Beginning distance computation
-  defp beginning_distance(page, distance) when page - distance < 1 do
+  # defp beginning_distance(page, total, distance) when page + distance > total and page < total do
+  #   page - distance
+  # end
+  defp beginning_distance(page, _total, distance) when page - distance < 1 do
     page - (distance + (page - distance - 1))
   end
-  defp beginning_distance(page, distance) do
+  defp beginning_distance(page, total, distance) when page <= total  do
     page - distance
+  end
+  defp beginning_distance(page, total, distance) when page > total do
+    total - distance
   end
 
   # End distance computation
-  defp end_distance(page, 0, _distance) do
-    page
-  end
-  defp end_distance(page, total, distance) when page + distance >= total do
+  defp end_distance(page, total, distance) when page + distance >= total and total != 0 do
     total
+  end
+  defp end_distance(page, 0, _distance) do
+    1
   end
   defp end_distance(page, _total, distance) do
     page + distance
