@@ -203,7 +203,7 @@ defmodule Scrivener.HTML do
   end
 
   defp page({text, page_number}, url_params, args, page_param, path, paginator, :semantic) do
-    params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
+    params_with_page = url_params ++ [{page_param, page_number}]
     to = apply(path, args ++ [params_with_page])
     if to do
       link(safe(text), to: to, class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
@@ -212,7 +212,7 @@ defmodule Scrivener.HTML do
     end
   end
   defp page({text, page_number}, url_params, args, page_param, path, paginator, style) do
-    params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
+    params_with_page = url_params ++ [{page_param, page_number}]
     content_tag :li, class: li_classes_for_style(paginator, page_number, style) |> Enum.join(" ") do
       to = apply(path, args ++ [params_with_page])
       if to do
