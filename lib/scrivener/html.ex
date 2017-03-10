@@ -214,13 +214,12 @@ defmodule Scrivener.HTML do
   defp page({text, page_number}, url_params, args, page_param, path, paginator, style) do
     params_with_page = Keyword.merge(url_params, [{page_param, page_number}])
     content_tag :li, class: li_classes_for_style(paginator, page_number, style) |> Enum.join(" ") do
-      to = apply(path, args ++ [params_with_page])
-      if to do
-        link(safe(text), to: to, class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
-      else
+      if page_number == paginator.page_number do
         style
         |> blank_link_tag()
         |> content_tag(safe(text), class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
+      else
+        link(safe(text), to: apply(path, args ++ [params_with_page]), class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
       end
     end
   end
