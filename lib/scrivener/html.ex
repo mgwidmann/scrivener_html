@@ -29,6 +29,8 @@ defmodule Scrivener.HTML do
   See `Scrivener.HTML.raw_pagination_links/2` for option descriptions.
 
   For custom HTML output, see `Scrivener.HTML.raw_pagination_links/2`.
+
+  For SEO related functions, see `Scrivener.HTML.SEO`
   """
 
   defmodule Default do
@@ -117,18 +119,18 @@ defmodule Scrivener.HTML do
   def pagination_links(conn, paginator, [{_, _} | _] = opts), do: pagination_links(conn, paginator, [], opts)
   def pagination_links(conn, paginator, [_ | _] = args), do: pagination_links(conn, paginator, args, [])
 
-  defp find_path_fn(nil, _path_args), do: &Default.path/3
-  defp find_path_fn([], _path_args), do: fn _, _, _ -> nil end
+  def find_path_fn(nil, _path_args), do: &Default.path/3
+  def find_path_fn([], _path_args), do: fn _, _, _ -> nil end
   # Define a different version of `find_path_fn` whenever Phoenix is available.
   if Code.ensure_loaded(Phoenix.Naming) do
-    defp find_path_fn(entries, path_args) do
+    def find_path_fn(entries, path_args) do
       routes_helper_module = Application.get_env(:scrivener_html, :routes_helper) || raise("Scrivener.HTML: Unable to find configured routes_helper module (ex. MyApp.Router.Helper)")
       path = (path_args) |> Enum.reduce(name_for(List.first(entries), ""), &name_for/2)
       {path_fn, []} = Code.eval_quoted(quote do: &unquote(routes_helper_module).unquote(:"#{path <> "_path"}")/unquote(length(path_args) + 3))
       path_fn
     end
   else
-    defp find_path_fn(_entries, _args), do: &Default/3
+    def find_path_fn(_entries, _args), do: &Default/3
   end
 
   defp name_for(model, acc) do
@@ -206,7 +208,7 @@ defmodule Scrivener.HTML do
     params_with_page = url_params ++ [{page_param, page_number}]
     to = apply(path, args ++ [params_with_page])
     if to do
-      link(safe(text), to: to, class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
+      link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel_link(paginator, page_number), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
     else
       content_tag :a, safe(text), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
     end
@@ -216,7 +218,7 @@ defmodule Scrivener.HTML do
     content_tag :li, class: li_classes_for_style(paginator, page_number, style) |> Enum.join(" ") do
       to = apply(path, args ++ [params_with_page])
       if to do
-        link(safe(text), to: to, class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
+        link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel_link(paginator, page_number), class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
       else
         style
         |> blank_link_tag()
@@ -395,4 +397,6 @@ defmodule Scrivener.HTML do
     |> to_string()
     |> raw()
   end
+
+  def defaults(), do: @defaults
 end
