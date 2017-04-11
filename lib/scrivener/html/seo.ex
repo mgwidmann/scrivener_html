@@ -2,6 +2,9 @@ defmodule Scrivener.HTML.SEO do
   @moduledoc """
   SEO related functions for pagination. See [https://support.google.com/webmasters/answer/1663744?hl=en](https://support.google.com/webmasters/answer/1663744?hl=en)
   for more information.
+
+  `Scrivener.HTML.pagination_links/4` will use this module to add `rel` to each link produced to indicate to search engines which
+  link is the `next` or `prev`ious link in the chain of links. The default is `canonical` otherwise.
   """
   alias Scrivener.Page
   use Phoenix.HTML
@@ -9,12 +12,17 @@ defmodule Scrivener.HTML.SEO do
   @defaults Keyword.drop(Scrivener.HTML.defaults, [:view_style])
 
   @doc """
+  Produces the value for a `rel` attribute in an `<a>` tag. Returns either `"next"`, `"prev"` or `"canonical"`.
   """
   def rel_link(%Page{page_number: current_page}, page_number) when current_page + 1 == page_number, do: "next"
   def rel_link(%Page{page_number: current_page}, page_number) when current_page - 1 == page_number, do: "prev"
   def rel_link(_paginator, _page_number), do: "canonical"
 
   @doc """
+  Produces `<link/>` tags for putting in the `<head>` to help SEO as recommended by Google webmasters.
+
+  Arguments are the same as `Scrivener.HTML.pagination_links/4`. Consider using one of the following techniques to
+  call this function: [http://blog.danielberkompas.com/2016/01/28/seo-tags-in-phoenix.html](http://blog.danielberkompas.com/2016/01/28/seo-tags-in-phoenix.html)
   """
   def header_links(conn, %Page{page_number: 1} = paginator, args, opts) do
     next_header_link(conn, paginator, args, opts)
