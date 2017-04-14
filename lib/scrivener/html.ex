@@ -13,7 +13,7 @@ defmodule Scrivener.HTML do
 
       defmodule MyApp.UserView do
         use MyApp.Web, :view
-        import Scrivener.HTML
+        use Scrivener.HTML
       end
 
   Use in your template.
@@ -30,20 +30,31 @@ defmodule Scrivener.HTML do
 
   For custom HTML output, see `Scrivener.HTML.raw_pagination_links/2`.
 
-  For SEO related functions, see `Scrivener.HTML.SEO`
+  For SEO related functions, see `Scrivener.HTML.SEO` (these are automatically imported).
   """
 
+  @doc false
+  defmacro __using__(_) do
+    quote do
+      import Scrivener.HTML
+      import Scrivener.SEO
+    end
+  end
+
   defmodule Default do
-    @doc """
+    @doc ~S"""
     Default path function when none provided. Used when automatic path function
     resolution cannot be performed.
+
+        iex> Scrivener.HTML.Default.path(%Plug.Conn{}, :index, page: 4)
+        "?page=4"
     """
-    def path(_conn, :index, opts) do
+    def path(_conn, _action, opts \\ []) do
       ("?" <> Plug.Conn.Query.encode(opts))
     end
   end
 
-  @doc """
+  @doc ~S"""
   Generates the HTML pagination links for a given paginator returned by Scrivener.
 
   The default options are:
@@ -58,23 +69,8 @@ defmodule Scrivener.HTML do
 
   An example of the output data:
 
-      iex> Scrivener.HTML.pagination_links(%Scrivener.Page{total_pages: 10, page_number: 5})
-      {:safe,
-        ["<nav>",
-         ["<ul class=\"pagination\">",
-          [["<li>", ["<a class=\"\" href=\"?page=4\">", "&lt;&lt;", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=1\">", "1", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=2\">", "2", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=3\">", "3", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=4\">", "4", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"active\" href=\"?page=5\">", "5", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=6\">", "6", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=7\">", "7", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=8\">", "8", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=9\">", "9", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=10\">", "10", "</a>"], "</li>"],
-           ["<li>", ["<a class=\"\" href=\"?page=6\">", "&gt;&gt;", "</a>"], "</li>"]],
-          "</ul>"], "</nav>"]}
+      iex> Scrivener.HTML.pagination_links(%Scrivener.Page{total_pages: 10, page_number: 5}) |> Phoenix.HTML.safe_to_string()
+      "<nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=4\" rel=\"prev\">&lt;&lt;</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"canonical\">1</a></li><li class=\"\"><a class=\"\" href=\"?page=2\" rel=\"canonical\">2</a></li><li class=\"\"><a class=\"\" href=\"?page=3\" rel=\"canonical\">3</a></li><li class=\"\"><a class=\"\" href=\"?page=4\" rel=\"prev\">4</a></li><li class=\"active\"><a class=\"\" href=\"?page=5\" rel=\"canonical\">5</a></li><li class=\"\"><a class=\"\" href=\"?page=6\" rel=\"next\">6</a></li><li class=\"\"><a class=\"\" href=\"?page=7\" rel=\"canonical\">7</a></li><li class=\"\"><a class=\"\" href=\"?page=8\" rel=\"canonical\">8</a></li><li class=\"\"><a class=\"\" href=\"?page=9\" rel=\"canonical\">9</a></li><li class=\"\"><a class=\"\" href=\"?page=10\" rel=\"canonical\">10</a></li><li class=\"\"><a class=\"\" href=\"?page=6\" rel=\"next\">&gt;&gt;</a></li></ul></nav>"
 
   In order to generate links with nested objects (such as a list of comments for a given post)
   it is necessary to pass those arguments. All arguments in the `args` parameter will be directly
@@ -208,7 +204,7 @@ defmodule Scrivener.HTML do
     params_with_page = url_params ++ [{page_param, page_number}]
     to = apply(path, args ++ [params_with_page])
     if to do
-      link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel_link(paginator, page_number), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
+      link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel(paginator, page_number), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
     else
       content_tag :a, safe(text), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
     end
@@ -218,7 +214,7 @@ defmodule Scrivener.HTML do
     content_tag :li, class: li_classes_for_style(paginator, page_number, style) |> Enum.join(" ") do
       to = apply(path, args ++ [params_with_page])
       if to do
-        link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel_link(paginator, page_number), class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
+        link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel(paginator, page_number), class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
       else
         style
         |> blank_link_tag()

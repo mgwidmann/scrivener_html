@@ -1,6 +1,7 @@
 defmodule Scrivener.HTMLTest do
   use ExUnit.Case
   alias Scrivener.HTML
+  doctest Scrivener.HTML
 
   import Scrivener.Support.HTML
   alias Scrivener.Page
