@@ -275,6 +275,8 @@ defmodule Scrivener.HTML do
 
       iex> Scrivener.HTML.raw_pagination_links(%{total_pages: 10, page_number: 5})
       [{"<<", 4}, {1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}, {8, 8}, {9, 9}, {10, 10}, {">>", 6}]
+      iex> Scrivener.HTML.raw_pagination_links(%{total_pages: 20, page_number: 10}, first: ["←"], last: ["→"])
+      [{"<<", 9}, {["←"], 1}, {:ellipsis, {:safe, "&hellip;"}}, {5, 5}, {6, 6},{7, 7}, {8, 8}, {9, 9}, {10, 10}, {11, 11}, {12, 12}, {13, 13}, {14, 14},{15, 15}, {:ellipsis, {:safe, "&hellip;"}}, {["→"], 20}, {">>", 11}]
 
   Simply loop and pattern match over each item and transform it to your custom HTML.
   """
@@ -293,7 +295,9 @@ defmodule Scrivener.HTML do
       :previous -> if options[:previous], do: {options[:previous], paginator.page_number - 1}
       :first_ellipsis -> if options[:ellipsis] && options[:first], do: {:ellipsis, options[:ellipsis]}
       :last_ellipsis -> if options[:ellipsis] && options[:last], do: {:ellipsis, options[:ellipsis]}
-      num -> {num, num}
+      :first -> if options[:first], do: {options[:first], 1}
+      :last -> if options[:last], do: {options[:last], paginator.total_pages}
+      num when is_number(num) -> {num, num}
     end) |> Enum.filter(&(&1))
   end
 
@@ -344,12 +348,18 @@ defmodule Scrivener.HTML do
   defp add_first(page, distance, true) when page - distance > 1 do
     [1]
   end
+  defp add_first(page, distance, first) when page - distance > 1 and first != false do
+    [:first]
+  end
   defp add_first(_page, _distance, _included) do
     []
   end
 
   defp add_last(list, page, total, distance, true) when page + distance < total do
     list ++ [total]
+  end
+  defp add_last(list, page, total, distance, last) when page + distance < total and last != false do
+    list ++ [:last]
   end
   defp add_last(list, _page, _total, _distance, _included) do
     list

@@ -47,6 +47,14 @@ defmodule Scrivener.HTMLTest do
       assert pages(5..10) == links_with_opts total_pages: 10, page_number: 100
     end
 
+    test "with custom IO list as first" do
+      assert pages_with_first({["←"], 1}, 5..15) == links_with_opts [total_pages: 20, page_number: 10], first: ["←"]
+    end
+
+    test "with custom IO list as last" do
+      assert pages_with_last({["→"], 20}, 5..15) == links_with_opts [total_pages: 20, page_number: 10], last: ["→"]
+    end
+
   end
 
   describe "raw_pagination_links next" do
@@ -104,7 +112,7 @@ defmodule Scrivener.HTMLTest do
   describe "raw_pagination_links last" do
 
     test "includes the last" do
-      assert pages_with_last(5..15, 20) == links_with_opts [total_pages: 20, page_number: 10], last: true
+      assert pages_with_last(20, 5..15) == links_with_opts [total_pages: 20, page_number: 10], last: true
     end
 
     test "does not the include the last when it is already included" do
