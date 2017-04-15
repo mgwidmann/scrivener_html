@@ -1,6 +1,7 @@
 defmodule Scrivener.HTMLTest do
   use ExUnit.Case
   alias Scrivener.HTML
+  doctest Scrivener.HTML
 
   import Scrivener.Support.HTML
   alias Scrivener.Page
@@ -219,14 +220,14 @@ defmodule Scrivener.HTMLTest do
     test "allows unicode" do
       html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, previous: "«")
       assert Phoenix.HTML.safe_to_string(html) == """
-      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\">«</a></li><li class=\"\"><a class=\"\" href=\"?page=1\">1</a></li><li class=\"active\"><a class=\"\" href=\"?page=2\">2</a></li></ul></nav>
+      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">«</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\" href=\"?page=2\" rel=\"canonical\">2</a></li></ul></nav>
       """ |> String.trim_trailing
     end
 
     test "allows using raw" do
       html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, previous: Phoenix.HTML.raw("&leftarrow;"))
       assert Phoenix.HTML.safe_to_string(html) == """
-      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\">&leftarrow;</a></li><li class=\"\"><a class=\"\" href=\"?page=1\">1</a></li><li class=\"active\"><a class=\"\" href=\"?page=2\">2</a></li></ul></nav>
+      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">&leftarrow;</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\" href=\"?page=2\" rel=\"canonical\">2</a></li></ul></nav>
       """ |> String.trim_trailing
     end
 
@@ -256,53 +257,9 @@ defmodule Scrivener.HTMLTest do
       Application.put_env(:scrivener_html, :view_style, :bootstrap)
       Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
 
-      assert {:safe, [60, "nav", [], 62,
-                      [60, "ul", [[32, "class", 61, 34, "pagination", 34]], 62,
-                       [[60, "li", [[32, "class", 61, 34, "active", 34]], 62,
-                         [60, "a",
-                          [[32, "class", 61, 34, "", 34],
-                           [32, "href", 61, 34, "/posts?url_param=param&page=1", 34]],
-                          62, "1", 60, 47, "a", 62], 60, 47, "li", 62],
-                        [60, "li", [[32, "class", 61, 34, "", 34]], 62,
-                         [60, "a",
-                          [[32, "class", 61, 34, "", 34],
-                           [32, "href", 61, 34, "/posts?url_param=param&page=2", 34]],
-                          62, "2", 60, 47, "a", 62], 60, 47, "li", 62],
-                        [60, "li", [[32, "class", 61, 34, "", 34]], 62,
-                         [60, "a",
-                          [[32, "class", 61, 34, "", 34],
-                           [32, "href", 61, 34, "/posts?url_param=param&page=3", 34]],
-                          62, "3", 60, 47, "a", 62], 60, 47, "li", 62],
-                        [60, "li", [[32, "class", 61, 34, "", 34]], 62,
-                         [60, "a",
-                          [[32, "class", 61, 34, "", 34],
-                           [32, "href", 61, 34, "/posts?url_param=param&page=4", 34]],
-                          62, "4", 60, 47, "a", 62], 60, 47, "li", 62],
-                        [60, "li", [[32, "class", 61, 34, "", 34]], 62,
-                         [60, "a",
-                          [[32, "class", 61, 34, "", 34],
-                           [32, "href", 61, 34, "/posts?url_param=param&page=5", 34]],
-                          62, "5", 60, 47, "a", 62], 60, 47, "li", 62],
-                        [60, "li", [[32, "class", 61, 34, "", 34]], 62,
-                         [60, "a",
-                          [[32, "class", 61, 34, "", 34],
-                           [32, "href", 61, 34, "/posts?url_param=param&page=6", 34]],
-                          62, "6", 60, 47, "a", 62], 60, 47, "li", 62],
-                        [60, "li", [[32, "class", 61, 34, "", 34]], 62,
-                         [60, "span", [[32, "class", 61, 34, "", 34]], 62, "&hellip;",
-                          60, 47, "span", 62], 60, 47, "li", 62],
-                        [60, "li", [[32, "class", 61, 34, "", 34]], 62,
-                         [60, "a",
-                          [[32, "class", 61, 34, "", 34],
-                           [32, "href", 61, 34, "/posts?url_param=param&page=20", 34]],
-                          62, "20", 60, 47, "a", 62], 60, 47, "li", 62],
-                        [60, "li", [[32, "class", 61, 34, "", 34]], 62,
-                         [60, "a",
-                          [[32, "class", 61, 34, "", 34],
-                           [32, "href", 61, 34, "/posts?url_param=param&page=2", 34]],
-                          62, "&gt;&gt;", 60, 47, "a", 62], 60, 47, "li", 62]], 60, 47,
-                       "ul", 62], 60, 47, "nav", 62]} =
+      assert "<nav><ul class=\"pagination\"><li class=\"active\"><a class=\"\" href=\"/posts?url_param=param&page=1\" rel=\"canonical\">1</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=2\" rel=\"next\">2</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=3\" rel=\"canonical\">3</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=4\" rel=\"canonical\">4</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=5\" rel=\"canonical\">5</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=6\" rel=\"canonical\">6</a></li><li class=\"\"><span class=\"\">&hellip;</span></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=20\" rel=\"canonical\">20</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=2\" rel=\"next\">&gt;&gt;</a></li></ul></nav>" ==
         HTML.pagination_links(build_conn(), %Page{entries: [%{__struct__: Post, some: :object}], page_number: 1, page_size: 10, total_entries: 200, total_pages: 20}, url_param: "param")
+        |> Phoenix.HTML.safe_to_string()
     end
   end
 
