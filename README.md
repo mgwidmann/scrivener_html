@@ -141,7 +141,7 @@ _(this example uses materialize icons)_
 <%= pagination_links @conn, @page, first: ~E(<i class="material-icons">chevron_left</i>), last: ~E(<i class="material-icons">chevron_right</i>) %>
 ```
 
-There are five view styles currently supported:
+There are six view styles currently supported:
 
 - `:bootstrap` (the default) This styles the pagination links in a manner that
   is expected by Bootstrap 3.x.
@@ -153,6 +153,7 @@ There are five view styles currently supported:
   Semantic UI 2.x.
 - `:materialize` This styles the pagination links in a manner that
   is expected by Materialize css 0.x.
+- `:bulma` This styles the pagination links in a manner that is expected by Bulma 0.4.x, using the `is-centered` as a default.
 
 For custom HTML output, see `Scrivener.HTML.raw_pagination_links/2`.
 
