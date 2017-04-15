@@ -6,6 +6,12 @@ defmodule Scrivener.HTMLTest do
   import Scrivener.Support.HTML
   alias Scrivener.Page
 
+  setup do
+    Application.put_env(:scrivener_html, :view_style, :bootstrap)
+    Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
+    :ok
+  end
+
   describe "raw_pagination_links for a page" do
 
     test "in the middle" do
@@ -263,25 +269,17 @@ defmodule Scrivener.HTMLTest do
     end
   end
 
-  describe "Semantic UI" do
-    test "renders Semantic UI styling" do
-      use Phoenix.ConnTest
-      Application.put_env(:scrivener_html, :view_style, :semantic)
-      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
+  describe "View Styles" do
+    use Phoenix.ConnTest
 
+    test "renders Semantic UI styling" do
       assert {:safe, [60, "div", [[32, "class", 61, 34, "ui pagination menu", 34]], 62,
                       [[60, "a", [[32, "class", 61, 34, "active item", 34]], 62, "1",
                         60, 47, "a", 62]], 60, 47, "div", 62]} =
-        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
+        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0}, view_style: :semantic)
     end
-  end
 
-  describe "Foundation for Sites 6.x" do
     test "renders Foundation for Sites 6.x styling" do
-      use Phoenix.ConnTest
-      Application.put_env(:scrivener_html, :view_style, :foundation)
-      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
-
       assert {:safe, [60, "ul",
                       [[32, "class", 61, 34, "pagination", 34],
                        [32, "role", 61, 34, "pagination", 34]], 62,
@@ -294,14 +292,10 @@ defmodule Scrivener.HTMLTest do
                        [60, "li", [[32, "class", 61, 34, "", 34]], 62,
                         [60, "span", [[32, "class", 61, 34, "", 34]], 62, "&gt;&gt;",
                          60, 47, "span", 62], 60, 47, "li", 62]], 60, 47, "ul", 62]} =
-        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 20, total_pages: 2})
+        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 20, total_pages: 2}, view_style: :foundation)
     end
 
     test "renders Foundation for Sites 6.x styling with ellipsis" do
-      use Phoenix.ConnTest
-      Application.put_env(:scrivener_html, :view_style, :foundation)
-      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
-
       assert {:safe, [60, "ul",
                        [[32, "class", 61, 34, "pagination", 34],
                         [32, "role", 61, 34, "pagination", 34]], 62,
@@ -341,16 +335,10 @@ defmodule Scrivener.HTMLTest do
                         [60, "li", [[32, "class", 61, 34, "", 34]], 62,
                          [60, "span", [[32, "class", 61, 34, "", 34]], 62, "&gt;&gt;", 60, 47, "span",
                           62], 60, 47, "li", 62]], 60, 47, "ul", 62]} ==
-        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 3, page_size: 10, total_entries: 100, total_pages: 10}, [], ellipsis: true)
+        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 3, page_size: 10, total_entries: 100, total_pages: 10}, ellipsis: true, view_style: :foundation)
     end
-  end
 
-  describe "Bootstrap v4" do
     test "renders bootstrap v4 styling" do
-      use Phoenix.ConnTest
-      Application.put_env(:scrivener_html, :view_style, :bootstrap_v4)
-      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
-
       assert {:safe, [60, "nav", [[32, "aria-label", 61, 34, "Page navigation", 34]],
                         62,
                         [60, "ul", [[32, "class", 61, 34, "pagination", 34]], 62,
@@ -358,16 +346,10 @@ defmodule Scrivener.HTMLTest do
                            [60, "a", [[32, "class", 61, 34, "page-link", 34]], 62, "1",
                             60, 47, "a", 62], 60, 47, "li", 62]], 60, 47, "ul", 62], 60,
                         47, "nav", 62]} =
-        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0})
+        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 0, total_pages: 0}, view_style: :bootstrap_v4)
     end
-  end
 
-  describe "Materialize css" do
     test "renders materialize css styling" do
-      use Phoenix.ConnTest
-      Application.put_env(:scrivener_html, :view_style, :materialize)
-      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
-
       assert {:safe, [60, "ul", [[32, "class", 61, 34, "pagination", 34]], 62,
                        [[60, "li", [[32, "class", 61, 34, "active", 34]], 62,
                          [60, "a", [[32, "class", 61, 34, "", 34]], 62, "1", 60, 47, "a", 62], 60, 47,
@@ -377,27 +359,19 @@ defmodule Scrivener.HTMLTest do
                          "li", 62],
                         [60, "li", [[32, "class", 61, 34, "waves-effect", 34]], 62,
                          [60, "a", [[32, "class", 61, 34, "", 34]], 62, "&gt;&gt;", 60, 47, "a", 62],
-                         60, 47, "li", 62]], 60, 47, "ul", 62]} ==
-        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 2, total_pages: 2})
+                         60, 47, "li", 62]], 60, 47, "ul", 62]} =
+        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 2, total_pages: 2}, view_style: :materialize)
     end
-  end
 
-  describe "Bulma css" do
     test "renders bulma css styling" do
-      use Phoenix.ConnTest
-      Application.put_env(:scrivener_html, :view_style, :bulma)
-      Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
-
-      assert(
-        {:safe, [60, "nav", [[32, "class", 61, 34, "pagination is-centered", 34]], 62,
-          [60, "ul", [[32, "class", 61, 34, "pagination-list", 34]], 62,
-            [[60, "li", [[32, "class", 61, 34, "", 34]], 62,
-            [60, "a", [[32, "class", 61, 34, "pagination-link is-current", 34]], 62, "1", 60, 47, "a", 62], 60, 47,
-            "li", 62], [60, "li", [[32, "class", 61, 34, "", 34]], 62, [60, "a", [[32, "class", 61, 34, "pagination-link", 34]],
-            62, "2", 60, 47, "a", 62], 60, 47, "li", 62], [60, "li", [[32, "class", 61, 34, "", 34]], 62, [60, "a", [[32, "class", 61, 34, "pagination-link", 34]],
-            62, "&gt;&gt;", 60, 47, "a", 62], 60, 47, "li", 62]], 60, 47, "ul", 62], 60, 47, "nav", 62]
-        }
-      ) == HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 2, total_pages: 2})
+      assert {:safe, [60, "nav", [[32, "class", 61, 34, "pagination is-centered", 34]], 62,
+              [60, "ul", [[32, "class", 61, 34, "pagination-list", 34]], 62,
+                [[60, "li", [[32, "class", 61, 34, "", 34]], 62,
+                [60, "a", [[32, "class", 61, 34, "pagination-link is-current", 34]], 62, "1", 60, 47, "a", 62], 60, 47,
+                "li", 62], [60, "li", [[32, "class", 61, 34, "", 34]], 62, [60, "a", [[32, "class", 61, 34, "pagination-link", 34]],
+                62, "2", 60, 47, "a", 62], 60, 47, "li", 62], [60, "li", [[32, "class", 61, 34, "", 34]], 62, [60, "a", [[32, "class", 61, 34, "pagination-link", 34]],
+                62, "&gt;&gt;", 60, 47, "a", 62], 60, 47, "li", 62]], 60, 47, "ul", 62], 60, 47, "nav", 62]} =
+        HTML.pagination_links(build_conn(), %Page{entries: [], page_number: 1, page_size: 10, total_entries: 2, total_pages: 2}, view_style: :bulma)
     end
   end
 end
