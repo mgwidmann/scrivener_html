@@ -197,6 +197,9 @@ defmodule Scrivener.HTML do
     end
   end
 
+  defp page({:ellipsis, true}, url_params, args, page_param, path, paginator, :foundation) do
+    page({:ellipsis, ""}, url_params, args, page_param, path, paginator, :foundation)
+  end
   defp page({:ellipsis, true}, url_params, args, page_param, path, paginator, style) do
     page({:ellipsis, unquote(@raw_defaults[:ellipsis])}, url_params, args, page_param, path, paginator, style)
   end
