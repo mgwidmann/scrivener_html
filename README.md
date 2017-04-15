@@ -11,7 +11,7 @@ Add to `mix.exs`
   defp deps do
     [
       # ...
-      {:scrivener_html, "~> 1.1"}
+      {:scrivener_html, "~> 1.7"}
       # ...
     ]
   end
