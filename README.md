@@ -31,7 +31,9 @@ like the following:
 
 ```elixir
 config :scrivener_html,
-  routes_helper: MyApp.Router.Helpers
+  routes_helper: MyApp.Router.Helpers,
+  # If you use a single view style everywhere, you can configure it here. See View Styles below for more info.
+  view_style: :bootstrap
 ```
 
 Import to your view.
@@ -48,7 +50,7 @@ end
 Use in your template.
 
 ```elixir
-<%= for user <- @page.entries do %>
+<%= for user <- @page do %>
    ...
 <% end %>
 
@@ -64,7 +66,7 @@ def index(conn, params) do
   page = MyApp.User
           # Other query conditions can be done here
           |> MyApp.Repo.paginate(params)
-  render conn, :index, page: page
+  render conn, "index.html", page: page
 end
 ```
 
@@ -83,23 +85,27 @@ end
 
 You would need to pass in the `:locale` parameter and `:path` option like so:
 
+_(this would generate links like "/en/page?page=1")_
+
 ```elixir
 <%= pagination_links @conn, @page, ["en"], path: &pages_path/4 %>
 ```
 
 With a nested resource, simply add it to the list:
 
+_(this would generate links like "/en/pages/1?page=1")_
+
 ```elixir
 <%= pagination_links @conn, @page, ["en", @page_id], path: &page_path/4, action: :show %>
 ```
 
-#### Query String Parameters
+### Query String Parameters
 
 Any additional query string parameters can be passed in as well.
 
 ```elixir
 <%= pagination_links @conn, @page, ["en"], some_parameter: "data" %>
-<%# OR IF NO URL PARAMETERS %>
+# Or if there are no URL parameters
 <%= pagination_links @conn, @page, some_parameter: "data" %>
 ```
 
@@ -111,12 +117,14 @@ If you need to hit a different action other than `:index`, simply pass the actio
 <%= pagination_links @conn, @page, action: :show %>
 ```
 
-## Customizing Output
+### Customizing Output
 
 Below are the defaults which are used without passing in any options.
 
 ```elixir
-<%= pagination_links @page, distance: 5, next: ">>", previous: "<<", first: true, last: true, view_style: :bootstrap %>
+<%= pagination_links @conn, @page, [], distance: 5, next: ">>", previous: "<<", first: true, last: true, view_style: :bootstrap %>
+# Which is the same as
+<%= pagination_links @conn, @page %>
 ```
 
 To prevent HTML escaping (i.e. seeing things like `&lt;` on the page), simply use `Phoenix.HTML.raw/1` for any `&amp;` strings passed in, like so:
@@ -130,7 +138,10 @@ To show icons instead of text, simply render custom html templates, like:
 _(this example uses materialize icons)_
 
 ```elixir
+# Using Phoenix.HTML's sigil_E for EEx
 <%= pagination_links @conn, @page, previous: ~E(<i class="material-icons">chevron_left</i>), next: ~E(<i class="material-icons">chevron_right</i>) %>
+# Or by calling render
+<%= pagination_links @conn, @page, previous: render("pagination.html", direction: :prev), next: render("pagination.html", direction: :next)) %>
 ```
 
 The same can be done for first/last links as well (`v1.7.0` or higher).
@@ -140,6 +151,8 @@ _(this example uses materialize icons)_
 ```elixir
 <%= pagination_links @conn, @page, first: ~E(<i class="material-icons">chevron_left</i>), last: ~E(<i class="material-icons">chevron_right</i>) %>
 ```
+
+## View Styles
 
 There are six view styles currently supported:
 
@@ -154,6 +167,8 @@ There are six view styles currently supported:
 - `:materialize` This styles the pagination links in a manner that
   is expected by Materialize css 0.x.
 - `:bulma` This styles the pagination links in a manner that is expected by Bulma 0.4.x, using the `is-centered` as a default.
+
+## Extending
 
 For custom HTML output, see `Scrivener.HTML.raw_pagination_links/2`.
 
@@ -180,3 +195,9 @@ iex> Scrivener.HTML.pagination_links(%Scrivener.Page{total_pages: 10, page_numbe
   </ul>
 </nav>"
 ```
+
+## SEO
+
+SEO attributes like `rel` are automatically added to pagination links. In addition, a helper for header `<link>` tags is available (`v1.7.0` and higher) to be placed in the `<head>` tag.
+
+See `Scrivener.HTML.SEO` documentation for more information.
