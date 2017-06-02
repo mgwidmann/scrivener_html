@@ -37,7 +37,7 @@ defmodule Scrivener.HTML do
   defmacro __using__(_) do
     quote do
       import Scrivener.HTML
-      import Scrivener.SEO
+      import Scrivener.HTML.SEO
     end
   end
 
