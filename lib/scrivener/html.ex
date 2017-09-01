@@ -70,7 +70,7 @@ defmodule Scrivener.HTML do
   An example of the output data:
 
       iex> Scrivener.HTML.pagination_links(%Scrivener.Page{total_pages: 10, page_number: 5}) |> Phoenix.HTML.safe_to_string()
-      "<nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=4\" rel=\"prev\">&lt;&lt;</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"canonical\">1</a></li><li class=\"\"><a class=\"\" href=\"?page=2\" rel=\"canonical\">2</a></li><li class=\"\"><a class=\"\" href=\"?page=3\" rel=\"canonical\">3</a></li><li class=\"\"><a class=\"\" href=\"?page=4\" rel=\"prev\">4</a></li><li class=\"active\"><a class=\"\" href=\"?page=5\" rel=\"canonical\">5</a></li><li class=\"\"><a class=\"\" href=\"?page=6\" rel=\"next\">6</a></li><li class=\"\"><a class=\"\" href=\"?page=7\" rel=\"canonical\">7</a></li><li class=\"\"><a class=\"\" href=\"?page=8\" rel=\"canonical\">8</a></li><li class=\"\"><a class=\"\" href=\"?page=9\" rel=\"canonical\">9</a></li><li class=\"\"><a class=\"\" href=\"?page=10\" rel=\"canonical\">10</a></li><li class=\"\"><a class=\"\" href=\"?page=6\" rel=\"next\">&gt;&gt;</a></li></ul></nav>"
+      "<nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=4\" rel=\"prev\">&lt;&lt;</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"canonical\">1</a></li><li class=\"\"><a class=\"\" href=\"?page=2\" rel=\"canonical\">2</a></li><li class=\"\"><a class=\"\" href=\"?page=3\" rel=\"canonical\">3</a></li><li class=\"\"><a class=\"\" href=\"?page=4\" rel=\"prev\">4</a></li><li class=\"active\"><a class=\"\">5</a></li><li class=\"\"><a class=\"\" href=\"?page=6\" rel=\"next\">6</a></li><li class=\"\"><a class=\"\" href=\"?page=7\" rel=\"canonical\">7</a></li><li class=\"\"><a class=\"\" href=\"?page=8\" rel=\"canonical\">8</a></li><li class=\"\"><a class=\"\" href=\"?page=9\" rel=\"canonical\">9</a></li><li class=\"\"><a class=\"\" href=\"?page=10\" rel=\"canonical\">10</a></li><li class=\"\"><a class=\"\" href=\"?page=6\" rel=\"next\">&gt;&gt;</a></li></ul></nav>"
 
   In order to generate links with nested objects (such as a list of comments for a given post)
   it is necessary to pass those arguments. All arguments in the `args` parameter will be directly
@@ -218,7 +218,11 @@ defmodule Scrivener.HTML do
     params_with_page = url_params ++ [{page_param, page_number}]
     to = apply(path, args ++ [params_with_page])
     if to do
-      link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel(paginator, page_number), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
+      if active_page?(paginator, page_number) do
+        content_tag(:a, safe(text), class: link_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
+      else
+        link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel(paginator, page_number), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
+      end
     else
       content_tag :a, safe(text), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
     end
@@ -228,7 +232,11 @@ defmodule Scrivener.HTML do
     content_tag :li, class: li_classes_for_style(paginator, page_number, style) |> Enum.join(" ") do
       to = apply(path, args ++ [params_with_page])
       if to do
-        link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel(paginator, page_number), class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
+        if active_page?(paginator, page_number) do
+          content_tag(:a, safe(text), class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
+        else
+          link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel(paginator, page_number), class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" "))
+        end
       else
         style
         |> blank_link_tag()
@@ -236,6 +244,9 @@ defmodule Scrivener.HTML do
       end
     end
   end
+
+  defp active_page?(%{page_number: page_number}, page_number), do: true
+  defp active_page?(_paginator, _page_number), do: false
 
   defp li_classes_for_style(_paginator, :ellipsis, :bootstrap), do: []
   defp li_classes_for_style(paginator, page_number, :bootstrap) do

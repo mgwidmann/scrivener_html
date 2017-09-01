@@ -219,21 +219,21 @@ defmodule Scrivener.HTMLTest do
     end
 
     test "accepts an override page param name" do
-      html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, page_param: :custom_pp)
+      html = HTML.pagination_links(%Page{total_pages: 3, page_number: 3}, page_param: :custom_pp)
       assert Phoenix.HTML.safe_to_string(html) =~ ~r(custom_pp=2)
     end
 
     test "allows unicode" do
       html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, previous: "«")
       assert Phoenix.HTML.safe_to_string(html) == """
-      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">«</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\" href=\"?page=2\" rel=\"canonical\">2</a></li></ul></nav>
+      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">«</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\">2</a></li></ul></nav>
       """ |> String.trim_trailing
     end
 
     test "allows using raw" do
       html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, previous: Phoenix.HTML.raw("&leftarrow;"))
       assert Phoenix.HTML.safe_to_string(html) == """
-      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">&leftarrow;</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\" href=\"?page=2\" rel=\"canonical\">2</a></li></ul></nav>
+      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">&leftarrow;</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\">2</a></li></ul></nav>
       """ |> String.trim_trailing
     end
 
@@ -263,9 +263,9 @@ defmodule Scrivener.HTMLTest do
       Application.put_env(:scrivener_html, :view_style, :bootstrap)
       Application.put_env(:scrivener_html, :routes_helper, MyApp.Router.Helpers)
 
-      assert "<nav><ul class=\"pagination\"><li class=\"active\"><a class=\"\" href=\"/posts?url_param=param&page=1\" rel=\"canonical\">1</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=2\" rel=\"next\">2</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=3\" rel=\"canonical\">3</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=4\" rel=\"canonical\">4</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=5\" rel=\"canonical\">5</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=6\" rel=\"canonical\">6</a></li><li class=\"\"><span class=\"\">&hellip;</span></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=20\" rel=\"canonical\">20</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=2\" rel=\"next\">&gt;&gt;</a></li></ul></nav>" ==
-        HTML.pagination_links(build_conn(), %Page{entries: [%{__struct__: Post, some: :object}], page_number: 1, page_size: 10, total_entries: 200, total_pages: 20}, url_param: "param")
-        |> Phoenix.HTML.safe_to_string()
+      assert HTML.pagination_links(build_conn(), %Page{entries: [%{__struct__: Post, some: :object}], page_number: 1, page_size: 10, total_entries: 200, total_pages: 20}, url_param: "param")
+              |> Phoenix.HTML.safe_to_string() ==
+              "<nav><ul class=\"pagination\"><li class=\"active\"><a class=\"\">1</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=2\" rel=\"next\">2</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=3\" rel=\"canonical\">3</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=4\" rel=\"canonical\">4</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=5\" rel=\"canonical\">5</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=6\" rel=\"canonical\">6</a></li><li class=\"\"><span class=\"\">&hellip;</span></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=20\" rel=\"canonical\">20</a></li><li class=\"\"><a class=\"\" href=\"/posts?url_param=param&page=2\" rel=\"next\">&gt;&gt;</a></li></ul></nav>"
     end
   end
 
