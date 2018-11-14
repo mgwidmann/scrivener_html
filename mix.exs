@@ -47,7 +47,7 @@ defmodule ScrivenerHtml.Mixfile do
     [
       {:scrivener, "~> 1.2 or ~> 2.0"},
       {:phoenix_html, "~> 2.2"},
-      {:phoenix, "~> 1.0-pre and < 1.4.0", optional: true},
+      {:phoenix, "~> 1.0-pre and < 1.5.0", optional: true},
       {:plug, "~> 1.1" },
       {:ex_doc, "~> 0.15", only: :dev},
       {:earmark, "~> 1.1", only: :dev},
