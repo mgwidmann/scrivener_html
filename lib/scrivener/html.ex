@@ -219,7 +219,7 @@ defmodule Scrivener.HTML do
     to = apply(path, args ++ [params_with_page])
     if to do
       if active_page?(paginator, page_number) do
-        content_tag(:a, safe(text), class: link_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
+        content_tag(:a, safe(text), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
       else
         link(safe(text), to: to, rel: Scrivener.HTML.SEO.rel(paginator, page_number), class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" "))
       end
