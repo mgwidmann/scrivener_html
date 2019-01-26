@@ -226,14 +226,14 @@ defmodule Scrivener.HTMLTest do
     test "allows unicode" do
       html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, previous: "«")
       assert Phoenix.HTML.safe_to_string(html) == """
-      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">«</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\">2</a></li></ul></nav>
+      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?\" rel=\"prev\">«</a></li><li class=\"\"><a class=\"\" href=\"?\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\">2</a></li></ul></nav>
       """ |> String.trim_trailing
     end
 
     test "allows using raw" do
       html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, previous: Phoenix.HTML.raw("&leftarrow;"))
       assert Phoenix.HTML.safe_to_string(html) == """
-      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">&leftarrow;</a></li><li class=\"\"><a class=\"\" href=\"?page=1\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\">2</a></li></ul></nav>
+      <nav><ul class=\"pagination\"><li class=\"\"><a class=\"\" href=\"?\" rel=\"prev\">&leftarrow;</a></li><li class=\"\"><a class=\"\" href=\"?\" rel=\"prev\">1</a></li><li class=\"active\"><a class=\"\">2</a></li></ul></nav>
       """ |> String.trim_trailing
     end
 
