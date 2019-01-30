@@ -413,6 +413,9 @@ defmodule Scrivener.HTML do
   defp li_classes_for_style(_paginator, :ellipsis, :bulma), do: []
   defp li_classes_for_style(_paginator, _page_number, :bulma), do: []
 
+  defp link_classes_for_style(_paginator, :ellipsis, :semantic), do: ["disabled", "item"]
+  defp link_classes_for_style(_paginator, :ellipsis, :materialize), do: []
+  defp link_classes_for_style(_paginator, :ellipsis, :bulma), do: ["pagination-ellipsis"]
   defp link_classes_for_style(_paginator, _page_number, :bootstrap), do: []
   defp link_classes_for_style(_paginator, _page_number, :bootstrap_v4), do: ["page-link"]
   defp link_classes_for_style(_paginator, _page_number, :foundation), do: []
@@ -429,10 +432,6 @@ defmodule Scrivener.HTML do
       else: ["pagination-link"]
     )
   end
-
-  defp link_classes_for_style(_paginator, :ellipsis, :semantic), do: ["disabled", "item"]
-  defp link_classes_for_style(_paginator, :ellipsis, :materialize), do: []
-  defp link_classes_for_style(_paginator, :ellipsis, :bulma), do: ["pagination-ellipsis"]
 
   defp ellipsis_tag(:semantic), do: :div
   defp ellipsis_tag(_), do: :span
