@@ -3,23 +3,25 @@ defmodule ScrivenerHtml.Mixfile do
 
   @version "1.8.0"
   def project do
-    [app: :scrivener_html,
-     version: @version,
-     elixir: "~> 1.2",
-     name: "scrivener_html",
-     source_url: "git@github.com:mgwidmann/scrivener_html.git",
-     homepage_url: "https://github.com/mgwidmann/scrivener_html",
-     elixirc_paths: elixirc_paths(Mix.env),
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     description: "HTML helpers for Scrivener",
-     docs: [
-       main: Scrivener.HTML,
-       readme: "README.md"
-     ],
-     package: package(),
-     deps: deps(),
-     aliases: aliases()]
+    [
+      app: :scrivener_html,
+      version: @version,
+      elixir: "~> 1.2",
+      name: "scrivener_html",
+      source_url: "git@github.com:mgwidmann/scrivener_html.git",
+      homepage_url: "https://github.com/mgwidmann/scrivener_html",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      description: "HTML helpers for Scrivener",
+      docs: [
+        main: Scrivener.HTML,
+        readme: "README.md"
+      ],
+      package: package(),
+      deps: deps(),
+      aliases: aliases()
+    ]
   end
 
   # Configuration for the OTP application
@@ -48,9 +50,9 @@ defmodule ScrivenerHtml.Mixfile do
       {:scrivener, "~> 1.2 or ~> 2.0"},
       {:phoenix_html, "~> 2.2"},
       {:phoenix, "~> 1.0 and < 1.5.0", optional: true},
-      {:plug, "~> 1.1" },
+      {:plug, "~> 1.1"},
       {:ex_doc, "~> 0.19", only: :dev},
-      {:earmark, "~> 1.1", only: :dev},
+      {:earmark, "~> 1.1", only: :dev}
     ]
   end
 
@@ -63,12 +65,11 @@ defmodule ScrivenerHtml.Mixfile do
   end
 
   defp aliases do
-    [publish: ["hex.publish", "hex.publish docs", "tag"],
-     tag: &tag_release/1]
+    [publish: ["hex.publish", "hex.publish docs", "tag"], tag: &tag_release/1]
   end
 
   defp tag_release(_) do
-    Mix.shell.info "Tagging release as #{@version}"
+    Mix.shell().info("Tagging release as #{@version}")
     System.cmd("git", ["tag", "-a", "v#{@version}", "-m", "v#{@version}"])
     System.cmd("git", ["push", "--tags"])
   end

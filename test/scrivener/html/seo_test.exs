@@ -28,21 +28,65 @@ defmodule Scrivener.HTML.SEOTest do
 
   describe "#header_links" do
     test "on the first page" do
-      assert header_links(%Page{total_pages: 10, page_number: 1}) == {:safe, [
-        60, "link", [[32, "href", 61, 34, "?page=2", 34], [32, "rel", 61, 34, "next", 34]], 62, [], 60, 47, "link", 62
-      ]}
+      assert header_links(%Page{total_pages: 10, page_number: 1}) ==
+               {:safe,
+                [
+                  60,
+                  "link",
+                  [[32, "href", 61, 34, "?page=2", 34], [32, "rel", 61, 34, "next", 34]],
+                  62,
+                  [],
+                  60,
+                  47,
+                  "link",
+                  62
+                ]}
     end
 
     test "on the last page" do
-      assert header_links(%Page{total_pages: 10, page_number: 10}) == {:safe, [
-        60, "link", [[32, "href", 61, 34, "?page=9", 34], [32, "rel", 61, 34, "prev", 34]], 62, [], 60, 47, "link", 62
-      ]}
+      assert header_links(%Page{total_pages: 10, page_number: 10}) ==
+               {:safe,
+                [
+                  60,
+                  "link",
+                  [[32, "href", 61, 34, "?page=9", 34], [32, "rel", 61, 34, "prev", 34]],
+                  62,
+                  [],
+                  60,
+                  47,
+                  "link",
+                  62
+                ]}
     end
 
     test "on a middle page" do
-      assert header_links(%Page{total_pages: 10, page_number: 5}) == {:safe, [
-        [60, "link", [[32, "href", 61, 34, "?page=4", 34], [32, "rel", 61, 34, "prev", 34]], 62, [], 60, 47, "link", 62], "\n", [60, "link", [[32, "href", 61, 34, "?page=6", 34], [32, "rel", 61, 34, "next", 34]], 62, [], 60, 47, "link", 62]
-      ]}
+      assert header_links(%Page{total_pages: 10, page_number: 5}) ==
+               {:safe,
+                [
+                  [
+                    60,
+                    "link",
+                    [[32, "href", 61, 34, "?page=4", 34], [32, "rel", 61, 34, "prev", 34]],
+                    62,
+                    [],
+                    60,
+                    47,
+                    "link",
+                    62
+                  ],
+                  "\n",
+                  [
+                    60,
+                    "link",
+                    [[32, "href", 61, 34, "?page=6", 34], [32, "rel", 61, 34, "next", 34]],
+                    62,
+                    [],
+                    60,
+                    47,
+                    "link",
+                    62
+                  ]
+                ]}
     end
   end
 end
