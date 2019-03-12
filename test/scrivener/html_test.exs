@@ -293,6 +293,27 @@ defmodule Scrivener.HTMLTest do
       html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, q: [name: "joe"])
       assert Phoenix.HTML.safe_to_string(html) =~ ~r(q\[name\]=joe)
     end
+
+    test "hide single page result from option" do
+      html =
+        HTML.pagination_links(%Page{total_pages: 1, page_number: 1},
+          q: [name: "joe"],
+          hide_single: true
+        )
+
+      assert Phoenix.HTML.safe_to_string(html) == ""
+    end
+
+    test "show pagination when there are multiple pages" do
+      html =
+        HTML.pagination_links(%Page{total_pages: 2, page_number: 1},
+          q: [name: "joe"],
+          hide_single: true
+        )
+
+      assert Phoenix.HTML.safe_to_string(html) ==
+               "<nav><ul class=\"pagination\"><li class=\"active\"><a class=\"\">1</a></li><li class=\"\"><a class=\"\" href=\"?q[name]=joe&amp;page=2\" rel=\"next\">2</a></li><li class=\"\"><a class=\"\" href=\"?q[name]=joe&amp;page=2\" rel=\"next\">&gt;&gt;</a></li></ul></nav>"
+    end
   end
 
   describe "Phoenix conn()" do

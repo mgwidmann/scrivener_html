@@ -107,20 +107,30 @@ defmodule Scrivener.HTML do
         view_style:
           opts[:view_style] || Application.get_env(:scrivener_html, :view_style, :bootstrap)
       )
+      |> Keyword.merge(
+        hide_single:
+          opts[:hide_single] || Application.get_env(:scrivener_html, :hide_single, false)
+      )
 
     merged_opts = Keyword.merge(@defaults, opts)
 
     path = opts[:path] || find_path_fn(conn && paginator.entries, args)
-    params = Keyword.drop(opts, Keyword.keys(@defaults) ++ [:path])
+    params = Keyword.drop(opts, Keyword.keys(@defaults) ++ [:path, :hide_single])
 
-    # Ensure ordering so pattern matching is reliable
-    _pagination_links(paginator,
-      view_style: merged_opts[:view_style],
-      path: path,
-      args: [conn, merged_opts[:action]] ++ args,
-      page_param: merged_opts[:page_param],
-      params: params
-    )
+    hide_single_result = opts[:hide_single] && paginator.total_pages < 2
+
+    unless hide_single_result do
+      # Ensure ordering so pattern matching is reliable
+      _pagination_links(paginator,
+        view_style: merged_opts[:view_style],
+        path: path,
+        args: [conn, merged_opts[:action]] ++ args,
+        page_param: merged_opts[:page_param],
+        params: params
+      )
+    else
+      Phoenix.HTML.raw(nil)
+    end
   end
 
   def pagination_links(%Scrivener.Page{} = paginator),
