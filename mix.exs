@@ -8,7 +8,7 @@ defmodule ScrivenerHtml.Mixfile do
       version: @version,
       elixir: "~> 1.2",
       name: "scrivener_html",
-      source_url: "git@github.com:mgwidmann/scrivener_html.git",
+      source_url: "https://github.com/mgwidmann/scrivener_html",
       homepage_url: "https://github.com/mgwidmann/scrivener_html",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
