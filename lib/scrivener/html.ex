@@ -1,6 +1,6 @@
 defmodule Scrivener.HTML do
   use Phoenix.HTML
-  @defaults [view_style: :bootstrap, action: :index, page_param: :page]
+  @defaults [view_style: :bootstrap, action: :index, page_param: :page, hide_single: false]
   @view_styles [:bootstrap, :semantic, :foundation, :bootstrap_v4, :materialize, :bulma]
   @raw_defaults [
     distance: 5,
@@ -119,7 +119,9 @@ defmodule Scrivener.HTML do
 
     hide_single_result = opts[:hide_single] && paginator.total_pages < 2
 
-    unless hide_single_result do
+    if hide_single_result do
+      Phoenix.HTML.raw(nil)
+    else
       # Ensure ordering so pattern matching is reliable
       _pagination_links(paginator,
         view_style: merged_opts[:view_style],
@@ -128,8 +130,6 @@ defmodule Scrivener.HTML do
         page_param: merged_opts[:page_param],
         params: params
       )
-    else
-      Phoenix.HTML.raw(nil)
     end
   end
 
