@@ -341,7 +341,7 @@ defmodule Scrivener.HTML do
           class: link_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
         )
       else
-        link(safe(text),
+        do_link_fn(args, safe(text),
           to: to,
           rel: Scrivener.HTML.SEO.rel(paginator, page_number),
           class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
@@ -371,7 +371,7 @@ defmodule Scrivener.HTML do
             class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
           )
         else
-          link(safe(text),
+          do_link_fn(args, safe(text),
             to: to,
             rel: Scrivener.HTML.SEO.rel(paginator, page_number),
             class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
@@ -638,6 +638,25 @@ defmodule Scrivener.HTML do
     |> to_string()
     |> raw()
   end
+
+  defp do_link_fn(args, text, link_args) do
+    {mod, fun} = link_handler(args)
+
+    apply(mod, fun, [text, link_args])
+  end
+
+  if Code.ensure_compiled?(Phoenix.LiveView) do
+    def link_handler([_, action | _]) when is_atom(action) do
+      with {:module, mod} <- Code.ensure_compiled(action),
+           {:live, true} <- {:live, function_exported?(mod, :__live__, 0)} do
+        {Phoenix.LiveView, :live_link}
+      else
+        _ -> link_handler(nil)
+      end
+    end
+  end
+
+  def link_handler(_), do: {Phoenix.HTML.Link, :link}
 
   def defaults(), do: @defaults
 end
