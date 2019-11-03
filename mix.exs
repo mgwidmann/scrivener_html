@@ -48,11 +48,13 @@ defmodule ScrivenerHtml.Mixfile do
   defp deps do
     [
       {:scrivener, "~> 1.2 or ~> 2.0"},
-      {:phoenix_html, "~> 2.2"},
-      {:phoenix, "~> 1.0 and < 1.5.0", optional: true},
+      {:phoenix_html, "~> 2.13.2"},
+      {:phoenix, ">= 1.4.9 and < 1.5.0", optional: true},
+      {:phoenix_live_view, "> 0.0.0", optional: true},
       {:plug, "~> 1.1"},
       {:ex_doc, "~> 0.19", only: :dev},
-      {:earmark, "~> 1.1", only: :dev}
+      {:earmark, "~> 1.1", only: :dev},
+      {:floki, "> 0.0.0", only: :test}
     ]
   end
 
