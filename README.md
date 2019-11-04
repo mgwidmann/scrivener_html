@@ -117,6 +117,14 @@ If you need to hit a different action other than `:index`, simply pass the actio
 <%= pagination_links @conn, @page, action: :show %>
 ```
 
+**NEW:** Custom actions can also be used with a [`Phoenix.LiveView`](https://hexdocs.pm/phoenix_live_view):
+
+```elixir
+<%= pagination_links @socket, @page, action: MyAppWeb.EntriesLive %>
+```
+
+> When using a LiveView as the action, `Scrivener.HTML` will invoke the [`live_link/2`](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html#live_link/2) helper to generate your pagination links.
+
 ### Customizing Output
 
 Below are the defaults which are used without passing in any options.
