@@ -200,11 +200,12 @@ defmodule Scrivener.HTML do
          params: params
        ) do
     url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
+    link = link_handler(args)
 
     content_tag :nav do
       content_tag :ul, class: "pagination" do
         raw_pagination_links(paginator, params)
-        |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :bootstrap))
+        |> Enum.map(&page(&1, link, url_params, args, page_param, path, paginator, :bootstrap))
       end
     end
   end
@@ -218,11 +219,12 @@ defmodule Scrivener.HTML do
          params: params
        ) do
     url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
+    link = link_handler(args)
 
     content_tag :nav, "aria-label": "Page navigation" do
       content_tag :ul, class: "pagination" do
         raw_pagination_links(paginator, params)
-        |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :bootstrap_v4))
+        |> Enum.map(&page(&1, link, url_params, args, page_param, path, paginator, :bootstrap_v4))
       end
     end
   end
@@ -236,10 +238,11 @@ defmodule Scrivener.HTML do
          params: params
        ) do
     url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
+    link = link_handler(args)
 
     content_tag :div, class: "ui pagination menu" do
       raw_pagination_links(paginator, params)
-      |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :semantic))
+      |> Enum.map(&page(&1, link, url_params, args, page_param, path, paginator, :semantic))
     end
   end
 
@@ -252,10 +255,11 @@ defmodule Scrivener.HTML do
          params: params
        ) do
     url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
+    link = link_handler(args)
 
     content_tag :ul, class: "pagination", role: "pagination" do
       raw_pagination_links(paginator, params)
-      |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :foundation))
+      |> Enum.map(&page(&1, link, url_params, args, page_param, path, paginator, :foundation))
     end
   end
 
@@ -268,10 +272,11 @@ defmodule Scrivener.HTML do
          params: params
        ) do
     url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
+    link = link_handler(args)
 
     content_tag :ul, class: "pagination" do
       raw_pagination_links(paginator, params)
-      |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :materialize))
+      |> Enum.map(&page(&1, link, url_params, args, page_param, path, paginator, :materialize))
     end
   end
 
@@ -284,22 +289,24 @@ defmodule Scrivener.HTML do
          params: params
        ) do
     url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
+    link = link_handler(args)
 
     content_tag :nav, class: "pagination is-centered" do
       content_tag :ul, class: "pagination-list" do
         raw_pagination_links(paginator, params)
-        |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :bulma))
+        |> Enum.map(&page(&1, link, url_params, args, page_param, path, paginator, :bulma))
       end
     end
   end
 
-  defp page({:ellipsis, true}, url_params, args, page_param, path, paginator, :foundation) do
-    page({:ellipsis, ""}, url_params, args, page_param, path, paginator, :foundation)
+  defp page({:ellipsis, true}, link, url_params, args, page_param, path, paginator, :foundation) do
+    page({:ellipsis, ""}, link, url_params, args, page_param, path, paginator, :foundation)
   end
 
-  defp page({:ellipsis, true}, url_params, args, page_param, path, paginator, style) do
+  defp page({:ellipsis, true}, link, url_params, args, page_param, path, paginator, style) do
     page(
       {:ellipsis, unquote(@raw_defaults[:ellipsis])},
+      link,
       url_params,
       args,
       page_param,
@@ -309,13 +316,13 @@ defmodule Scrivener.HTML do
     )
   end
 
-  defp page({:ellipsis, text}, _url_params, _args, _page_param, _path, paginator, :semantic) do
+  defp page({:ellipsis, text}, _, _url_params, _args, _page_param, _path, paginator, :semantic) do
     content_tag(:div, safe(text),
       class: link_classes_for_style(paginator, :ellipsis, :semantic) |> Enum.join(" ")
     )
   end
 
-  defp page({:ellipsis, text}, _url_params, _args, _page_param, _path, paginator, style) do
+  defp page({:ellipsis, text}, _, _url_params, _args, _page_param, _path, paginator, style) do
     content_tag(:li, class: li_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" ")) do
       style
       |> ellipsis_tag
@@ -325,7 +332,7 @@ defmodule Scrivener.HTML do
     end
   end
 
-  defp page({text, page_number}, url_params, args, page_param, path, paginator, :semantic) do
+  defp page({text, page_number}, link, url_params, args, page_param, path, paginator, :semantic) do
     params_with_page =
       url_params ++
         case page_number > 1 do
@@ -341,7 +348,7 @@ defmodule Scrivener.HTML do
           class: link_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
         )
       else
-        do_link_fn(args, safe(text),
+        do_link(link, safe(text),
           to: to,
           rel: Scrivener.HTML.SEO.rel(paginator, page_number),
           class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
@@ -354,7 +361,7 @@ defmodule Scrivener.HTML do
     end
   end
 
-  defp page({text, page_number}, url_params, args, page_param, path, paginator, style) do
+  defp page({text, page_number}, link, url_params, args, page_param, path, paginator, style) do
     params_with_page =
       url_params ++
         case page_number > 1 do
@@ -371,7 +378,7 @@ defmodule Scrivener.HTML do
             class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
           )
         else
-          do_link_fn(args, safe(text),
+          do_link(link, safe(text),
             to: to,
             rel: Scrivener.HTML.SEO.rel(paginator, page_number),
             class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
@@ -639,14 +646,8 @@ defmodule Scrivener.HTML do
     |> raw()
   end
 
-  defp do_link_fn(args, text, link_args) do
-    {mod, fun} = link_handler(args)
-
-    apply(mod, fun, [text, link_args])
-  end
-
   if Code.ensure_compiled?(Phoenix.LiveView) do
-    def link_handler([_, action | _]) when is_atom(action) do
+    defp link_handler([_, action | _]) when is_atom(action) do
       with {:module, mod} <- Code.ensure_compiled(action),
            {:live, true} <- {:live, function_exported?(mod, :__live__, 0)} do
         {Phoenix.LiveView, :live_link}
@@ -656,7 +657,11 @@ defmodule Scrivener.HTML do
     end
   end
 
-  def link_handler(_), do: {Phoenix.HTML.Link, :link}
+  defp link_handler(_), do: {Phoenix.HTML.Link, :link}
+
+  defp do_link({mod, fun}, text, link_args) do
+    apply(mod, fun, [text, link_args])
+  end
 
   def defaults(), do: @defaults
 end
