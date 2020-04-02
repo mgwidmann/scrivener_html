@@ -27,7 +27,11 @@ defmodule Scrivener.HTML.SEOTest do
   end
 
   describe "#header_links" do
-    test "on the first page" do
+    test "on the first page with only one total pages" do
+      refute header_links(%Page{total_pages: 1, page_number: 1})
+    end
+
+    test "on the first page with more than one total pages" do
       assert header_links(%Page{total_pages: 10, page_number: 1}) ==
                {:safe,
                 [
