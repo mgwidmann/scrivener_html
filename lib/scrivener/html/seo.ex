@@ -43,18 +43,21 @@ defmodule Scrivener.HTML.SEO do
       iex> Phoenix.HTML.safe_to_string(Scrivener.HTML.SEO.header_links(%Scrivener.Page{total_pages: 10, page_number: 3}))
       "<link href=\"?page=2\" rel=\"prev\"></link>\n<link href=\"?page=4\" rel=\"next\"></link>"
   """
-  def header_links(conn, %Page{page_number: 1} = paginator, args, opts) do
-    next_header_link(conn, paginator, args, opts)
-  end
+  def header_links(
+        conn,
+        %Page{total_pages: total_pages, page_number: page_number} = paginator,
+        args,
+        opts
+      ) do
+    prev = if page_number > 1, do: prev_header_link(conn, paginator, args, opts)
+    next = if total_pages > page_number, do: next_header_link(conn, paginator, args, opts)
 
-  def header_links(conn, %Page{total_pages: page, page_number: page} = paginator, args, opts) do
-    prev_header_link(conn, paginator, args, opts)
-  end
-
-  def header_links(conn, paginator, args, opts) do
-    {:safe, prev} = prev_header_link(conn, paginator, args, opts)
-    {:safe, next} = next_header_link(conn, paginator, args, opts)
-    {:safe, [prev, "\n", next]}
+    if prev && next do
+      [{:safe, prev}, {:safe, next}] = [prev, next]
+      {:safe, [prev, "\n", next]}
+    else
+      prev || next
+    end
   end
 
   def header_links(%Scrivener.Page{} = paginator), do: header_links(nil, paginator, [], [])
