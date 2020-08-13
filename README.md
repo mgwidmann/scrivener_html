@@ -109,6 +109,13 @@ Any additional query string parameters can be passed in as well.
 <%= pagination_links @conn, @page, some_parameter: "data" %>
 ```
 
+You can also pass a string to be appended to the query using `query_string`. The page param is automatically stripped from the query_string.
+
+```elixir
+<%= pagination_links @conn, @page, query_string: "min-price=40&page=2" %>
+<%= pagination_links @conn, @page, query_string: conn.query_string %>
+```
+
 ### Custom Actions
 
 If you need to hit a different action other than `:index`, simply pass the action name to use in the url helper.
