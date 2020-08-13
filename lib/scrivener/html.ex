@@ -112,24 +112,34 @@ defmodule Scrivener.HTML do
           opts[:hide_single] || Application.get_env(:scrivener_html, :hide_single, false)
       )
 
+    link_fun = opts[:link_fun] || Application.get_env(:scrivener_html, :link_fun, &link/2)
+
     merged_opts = Keyword.merge(@defaults, opts)
 
     path = opts[:path] || find_path_fn(conn && paginator.entries, args)
-    params = Keyword.drop(opts, Keyword.keys(@defaults) ++ [:path, :hide_single])
+
+    opts_keys = [:path, :hide_single, :link_fun, :query_string]
+    params = Keyword.drop(opts, Keyword.keys(@defaults) ++ opts_keys)
 
     hide_single_result = opts[:hide_single] && paginator.total_pages < 2
+
+    url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
+
+    page_opts = %{
+      paginator: paginator,
+      url_params: url_params,
+      path: path,
+      args: [conn, merged_opts[:action]] ++ args,
+      page_param: merged_opts[:page_param],
+      link_fun: link_fun,
+      query_string: opts[:query_string]
+    }
 
     if hide_single_result do
       Phoenix.HTML.raw(nil)
     else
       # Ensure ordering so pattern matching is reliable
-      _pagination_links(paginator,
-        view_style: merged_opts[:view_style],
-        path: path,
-        args: [conn, merged_opts[:action]] ++ args,
-        page_param: merged_opts[:page_param],
-        params: params
-      )
+      _pagination_links(merged_opts[:view_style], params, page_opts)
     end
   end
 
@@ -178,13 +188,7 @@ defmodule Scrivener.HTML do
     "#{acc}#{if(acc != "", do: "_")}#{Phoenix.Naming.resource_name(model.__struct__)}"
   end
 
-  defp _pagination_links(_paginator,
-         view_style: style,
-         path: _path,
-         args: _args,
-         page_param: _page_param,
-         params: _params
-       )
+  defp _pagination_links(style, _params, _opts)
        when not (style in @view_styles) do
     raise "Scrivener.HTML: View style #{inspect(style)} is not a valid view style. Please use one of #{
             inspect(@view_styles)
@@ -192,130 +196,75 @@ defmodule Scrivener.HTML do
   end
 
   # Bootstrap implementation
-  defp _pagination_links(paginator,
-         view_style: :bootstrap,
-         path: path,
-         args: args,
-         page_param: page_param,
-         params: params
-       ) do
-    url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
-
+  defp _pagination_links(:bootstrap, params, page_opts) do
     content_tag :nav do
       content_tag :ul, class: "pagination" do
-        raw_pagination_links(paginator, params)
-        |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :bootstrap))
+        raw_pagination_links(page_opts.paginator, params)
+        |> Enum.map(&page(&1, page_opts, :bootstrap))
       end
     end
   end
 
   # Bootstrap implementation
-  defp _pagination_links(paginator,
-         view_style: :bootstrap_v4,
-         path: path,
-         args: args,
-         page_param: page_param,
-         params: params
-       ) do
-    url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
-
+  defp _pagination_links(:bootstrap_v4, params, page_opts) do
     content_tag :nav, "aria-label": "Page navigation" do
       content_tag :ul, class: "pagination" do
-        raw_pagination_links(paginator, params)
-        |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :bootstrap_v4))
+        raw_pagination_links(page_opts.paginator, params)
+        |> Enum.map(&page(&1, page_opts, :bootstrap_v4))
       end
     end
   end
 
   # Semantic UI implementation
-  defp _pagination_links(paginator,
-         view_style: :semantic,
-         path: path,
-         args: args,
-         page_param: page_param,
-         params: params
-       ) do
-    url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
-
+  defp _pagination_links(:semantic, params, page_opts) do
     content_tag :div, class: "ui pagination menu" do
-      raw_pagination_links(paginator, params)
-      |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :semantic))
+      raw_pagination_links(page_opts.paginator, params)
+      |> Enum.map(&page(&1, page_opts, :semantic))
     end
   end
 
   # Foundation for Sites 6.x implementation
-  defp _pagination_links(paginator,
-         view_style: :foundation,
-         path: path,
-         args: args,
-         page_param: page_param,
-         params: params
-       ) do
-    url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
-
+  defp _pagination_links(:foundation, params, page_opts) do
     content_tag :ul, class: "pagination", role: "pagination" do
-      raw_pagination_links(paginator, params)
-      |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :foundation))
+      raw_pagination_links(page_opts.paginator, params)
+      |> Enum.map(&page(&1, page_opts, :foundation))
     end
   end
 
   # Materialized implementation
-  defp _pagination_links(paginator,
-         view_style: :materialize,
-         path: path,
-         args: args,
-         page_param: page_param,
-         params: params
-       ) do
-    url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
-
+  defp _pagination_links(:materialize, params, page_opts) do
     content_tag :ul, class: "pagination" do
-      raw_pagination_links(paginator, params)
-      |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :materialize))
+      raw_pagination_links(page_opts.paginator, params)
+      |> Enum.map(&page(&1, page_opts, :materialize))
     end
   end
 
   # Bulma implementation
-  defp _pagination_links(paginator,
-         view_style: :bulma,
-         path: path,
-         args: args,
-         page_param: page_param,
-         params: params
-       ) do
-    url_params = Keyword.drop(params, Keyword.keys(@raw_defaults))
-
+  defp _pagination_links(:bulma, params, page_opts) do
     content_tag :nav, class: "pagination is-centered" do
       content_tag :ul, class: "pagination-list" do
-        raw_pagination_links(paginator, params)
-        |> Enum.map(&page(&1, url_params, args, page_param, path, paginator, :bulma))
+        raw_pagination_links(page_opts.paginator, params)
+        |> Enum.map(&page(&1, page_opts, :bulma))
       end
     end
   end
 
-  defp page({:ellipsis, true}, url_params, args, page_param, path, paginator, :foundation) do
-    page({:ellipsis, ""}, url_params, args, page_param, path, paginator, :foundation)
+  defp page({:ellipsis, true}, page_opts, :foundation) do
+    page({:ellipsis, ""}, page_opts, :foundation)
   end
 
-  defp page({:ellipsis, true}, url_params, args, page_param, path, paginator, style) do
-    page(
-      {:ellipsis, unquote(@raw_defaults[:ellipsis])},
-      url_params,
-      args,
-      page_param,
-      path,
-      paginator,
-      style
-    )
+  defp page({:ellipsis, true}, page_opts, style) do
+    page({:ellipsis, unquote(@raw_defaults[:ellipsis])}, page_opts, style)
   end
 
-  defp page({:ellipsis, text}, _url_params, _args, _page_param, _path, paginator, :semantic) do
-    content_tag(:div, safe(text),
-      class: link_classes_for_style(paginator, :ellipsis, :semantic) |> Enum.join(" ")
-    )
+  defp page({:ellipsis, text}, page_opts, :semantic) do
+    class = link_classes_for_style(page_opts.paginator, :ellipsis, :semantic) |> Enum.join(" ")
+    content_tag(:div, safe(text), class: class)
   end
 
-  defp page({:ellipsis, text}, _url_params, _args, _page_param, _path, paginator, style) do
+  defp page({:ellipsis, text}, page_opts, style) do
+    paginator = page_opts.paginator
+
     content_tag(:li, class: li_classes_for_style(paginator, :ellipsis, style) |> Enum.join(" ")) do
       style
       |> ellipsis_tag
@@ -325,15 +274,12 @@ defmodule Scrivener.HTML do
     end
   end
 
-  defp page({text, page_number}, url_params, args, page_param, path, paginator, :semantic) do
-    params_with_page =
-      url_params ++
-        case page_number > 1 do
-          true -> [{page_param, page_number}]
-          false -> []
-        end
-
-    to = apply(path, args ++ [params_with_page])
+  defp page(
+         {text, page_number},
+         page_opts = %{paginator: paginator, link_fun: link_fun},
+         :semantic
+       ) do
+    to = to(page_number, page_opts)
 
     if to do
       if active_page?(paginator, page_number) do
@@ -341,7 +287,7 @@ defmodule Scrivener.HTML do
           class: link_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
         )
       else
-        link(safe(text),
+        link_fun.(safe(text),
           to: to,
           rel: Scrivener.HTML.SEO.rel(paginator, page_number),
           class: li_classes_for_style(paginator, page_number, :semantic) |> Enum.join(" ")
@@ -354,36 +300,60 @@ defmodule Scrivener.HTML do
     end
   end
 
-  defp page({text, page_number}, url_params, args, page_param, path, paginator, style) do
-    params_with_page =
-      url_params ++
-        case page_number > 1 do
-          true -> [{page_param, page_number}]
-          false -> []
-        end
-
+  defp page(
+         {text, page_number},
+         page_opts = %{paginator: paginator, link_fun: link_fun},
+         style
+       ) do
     content_tag :li, class: li_classes_for_style(paginator, page_number, style) |> Enum.join(" ") do
-      to = apply(path, args ++ [params_with_page])
+      to = to(page_number, page_opts)
+      class = link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
 
       if to do
         if active_page?(paginator, page_number) do
-          content_tag(:a, safe(text),
-            class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
-          )
+          content_tag(:a, safe(text), class: class)
         else
-          link(safe(text),
+          link_fun.(safe(text),
             to: to,
             rel: Scrivener.HTML.SEO.rel(paginator, page_number),
-            class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
+            class: class
           )
         end
       else
         style
         |> blank_link_tag()
-        |> content_tag(safe(text),
-          class: link_classes_for_style(paginator, page_number, style) |> Enum.join(" ")
-        )
+        |> content_tag(safe(text), class: class)
       end
+    end
+  end
+
+  defp to(page_number, %{
+         url_params: url_params,
+         path: path,
+         args: args,
+         page_param: page_param,
+         query_string: query_string
+       }) do
+    params_with_page =
+      url_params ++
+        if page_number > 1,
+          do: [{page_param, page_number}],
+          else: []
+
+    to = apply(path, args ++ [params_with_page])
+
+    if to && query_string do
+      # Remove page params from the query
+      query_string =
+        query_string
+        |> String.replace(~r/&?page=\d/, "")
+        |> String.trim_leading("&")
+
+      if String.ends_with?(to, "?"),
+        do: to <> query_string,
+        else: to <> "&" <> query_string
+    else
+      to
     end
   end
 
