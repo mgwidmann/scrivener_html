@@ -33,7 +33,7 @@ defmodule Scrivener.HTML.SEOTest do
                 [
                   60,
                   "link",
-                  [[32, "href", 61, 34, "?page=2", 34], [32, "rel", 61, 34, "next", 34]],
+                  [32, "href", 61, 34, "?page=2", 34, 32, "rel", 61, 34, "next", 34],
                   62,
                   [],
                   60,
@@ -49,7 +49,7 @@ defmodule Scrivener.HTML.SEOTest do
                 [
                   60,
                   "link",
-                  [[32, "href", 61, 34, "?page=9", 34], [32, "rel", 61, 34, "prev", 34]],
+                  [32, "href", 61, 34, "?page=9", 34, 32, "rel", 61, 34, "prev", 34],
                   62,
                   [],
                   60,
@@ -66,7 +66,7 @@ defmodule Scrivener.HTML.SEOTest do
                   [
                     60,
                     "link",
-                    [[32, "href", 61, 34, "?page=4", 34], [32, "rel", 61, 34, "prev", 34]],
+                    [32, "href", 61, 34, "?page=4", 34, 32, "rel", 61, 34, "prev", 34],
                     62,
                     [],
                     60,
@@ -78,7 +78,7 @@ defmodule Scrivener.HTML.SEOTest do
                   [
                     60,
                     "link",
-                    [[32, "href", 61, 34, "?page=6", 34], [32, "rel", 61, 34, "next", 34]],
+                    [32, "href", 61, 34, "?page=6", 34, 32, "rel", 61, 34, "next", 34],
                     62,
                     [],
                     60,
