@@ -1,33 +1,39 @@
-# Scrivener.Html [![Build Status](https://semaphoreci.com/api/v1/projects/3b1ad27c-8991-4208-94d0-0bae42108482/638637/badge.svg)](https://semaphoreci.com/mgwidmann/scrivener_html)
+# Scrivener.Html
+
+[![Build Status](https://semaphoreci.com/api/v1/projects/3b1ad27c-8991-4208-94d0-0bae42108482/638637/badge.svg)](https://semaphoreci.com/mgwidmann/scrivener_html)
+[![Hex Version](https://img.shields.io/hexpm/v/scrivener_html.svg)](https://hex.pm/packages/scrivener_html)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/scrivener_html/)
+[![Total Download](https://img.shields.io/hexpm/dt/scrivener_html.svg)](https://hex.pm/packages/scrivener_html)
+[![License](https://img.shields.io/hexpm/l/scrivener_html.svg)](https://github.com/mgwidmann/scrivener_html/blob/master/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/mgwidmann/scrivener_html.svg)](https://github.com/mgwidmann/scrivener_html/commits/master)
 
 Helpers built to work with [Scrivener](https://github.com/drewolson/scrivener)'s page struct to easily build HTML output for various CSS frameworks.
 
 ## Setup
 
-Add to `mix.exs`
+Add `:scrivener_html` to `mix.exs`:
 
 ```elixir
-  # add :scrivener_html to deps
-  defp deps do
-    [
-      # ...
-      {:scrivener_html, "~> 1.8"}
-      # ...
-    ]
-  end
+# add :scrivener_html to deps
+defp deps do
+  [
+    # ...
+    {:scrivener_html, "~> 1.8"}
+    # ...
+  ]
+end
 
-  # add :scrivener_html to applications list
-  defp application do
-    [
-      # ...
-      applications: [ ..., :scrivener_html, ... ]
-      # ...
-    ]
-  end
+# add :scrivener_html to applications list
+defp application do
+  [
+    # ...
+    applications: [ ..., :scrivener_html, ... ]
+    # ...
+  ]
+end
 ```
 
-For use with Phoenix.HTML, configure the `:routes_helper` module in `config/config.exs`
-like the following:
+For use with Phoenix.HTML, configure the `:routes_helper` module in `config/config.exs` like the following:
 
 ```elixir
 config :scrivener_html,
@@ -36,7 +42,7 @@ config :scrivener_html,
   view_style: :bootstrap
 ```
 
-Import to your view.
+Import to your view:
 
 ```elixir
 defmodule MyApp.UserView do
@@ -47,7 +53,7 @@ end
 
 ## Example Usage
 
-Use in your template.
+Use in your template:
 
 ```elixir
 <%= for user <- @page do %>
@@ -101,7 +107,7 @@ _(this would generate links like "/en/pages/1?page=1")_
 
 ### Query String Parameters
 
-Any additional query string parameters can be passed in as well.
+Any additional query string parameters can be passed in as well:
 
 ```elixir
 <%= pagination_links @conn, @page, ["en"], some_parameter: "data" %>
@@ -119,7 +125,7 @@ If you need to hit a different action other than `:index`, simply pass the actio
 
 ### Customizing Output
 
-Below are the defaults which are used without passing in any options.
+Below are the defaults which are used without passing in any options:
 
 ```elixir
 <%= pagination_links @conn, @page, [], distance: 5, next: ">>", previous: "<<", first: true, last: true, view_style: :bootstrap %>
@@ -201,3 +207,10 @@ iex> Scrivener.HTML.pagination_links(%Scrivener.Page{total_pages: 10, page_numbe
 SEO attributes like `rel` are automatically added to pagination links. In addition, a helper for header `<link>` tags is available (`v1.7.0` and higher) to be placed in the `<head>` tag.
 
 See `Scrivener.HTML.SEO` documentation for more information.
+
+## Copyright and License
+
+Copyright (c) 2015 Matt Widmann
+
+This work is free. You can redistribute it and/or modify it under the
+terms of the MIT License. See the [LICENSE.md](./LICENSE.md) file for more details.

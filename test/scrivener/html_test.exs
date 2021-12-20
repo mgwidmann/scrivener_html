@@ -289,7 +289,7 @@ defmodule Scrivener.HTMLTest do
                |> String.trim_trailing()
     end
 
-    test "accept nested keyword list for additionnal params" do
+    test "accept nested keyword list for additional params" do
       html = HTML.pagination_links(%Page{total_pages: 2, page_number: 2}, q: [name: "joe"])
       assert Phoenix.HTML.safe_to_string(html) =~ ~r(q\[name\]=joe)
     end
