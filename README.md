@@ -117,6 +117,14 @@ If you need to hit a different action other than `:index`, simply pass the actio
 <%= pagination_links @conn, @page, action: :show %>
 ```
 
+### Custom Link Function
+
+Set `:link_fun` to any function with arity 2. Defaults to `Phoenix.HTML.link/2`.
+
+```elixir
+<%= pagination_links @conn, @page, link_fun: &live_link/2 %>
+```
+
 ### Customizing Output
 
 Below are the defaults which are used without passing in any options.
