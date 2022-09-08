@@ -41,7 +41,7 @@ defmodule Scrivener.HTML.SEO do
   call this function: [http://blog.danielberkompas.com/2016/01/28/seo-tags-in-phoenix.html](http://blog.danielberkompas.com/2016/01/28/seo-tags-in-phoenix.html)
 
       iex> Phoenix.HTML.safe_to_string(Scrivener.HTML.SEO.header_links(%Scrivener.Page{total_pages: 10, page_number: 3}))
-      "<link href=\"?page=2\" rel=\"prev\"></link>\n<link href=\"?page=4\" rel=\"next\"></link>"
+      "<link href=\"?page=2\" rel=\"prev\">\n<link href=\"?page=4\" rel=\"next\">"
   """
   def header_links(conn, %Page{page_number: 1} = paginator, args, opts) do
     next_header_link(conn, paginator, args, opts)
@@ -81,11 +81,11 @@ defmodule Scrivener.HTML.SEO do
 
   defp prev_header_link(conn, paginator, args, opts) do
     href = href(conn, paginator, args, opts, paginator.page_number - 1)
-    content_tag(:link, [], href: href, rel: rel(paginator, paginator.page_number - 1))
+    tag(:link, href: href, rel: rel(paginator, paginator.page_number - 1))
   end
 
   defp next_header_link(conn, paginator, args, opts) do
     href = href(conn, paginator, args, opts, paginator.page_number + 1)
-    content_tag(:link, [], href: href, rel: rel(paginator, paginator.page_number + 1))
+    tag(:link, href: href, rel: rel(paginator, paginator.page_number + 1))
   end
 end
