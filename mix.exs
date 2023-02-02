@@ -1,12 +1,12 @@
 defmodule ScrivenerHtml.Mixfile do
   use Mix.Project
 
-  @version "1.8.1"
+  @version "1.9.0"
   def project do
     [
       app: :scrivener_html,
       version: @version,
-      elixir: "~> 1.2",
+      elixir: "~> 1.10",
       name: "scrivener_html",
       source_url: "https://github.com/mgwidmann/scrivener_html",
       homepage_url: "https://github.com/mgwidmann/scrivener_html",
@@ -29,7 +29,8 @@ defmodule ScrivenerHtml.Mixfile do
   # Type `mix help compile.app` for more information
   def application do
     [
-      applications: [:logger]
+      applications: [:logger],
+      extra_applications: [:phoenix, :phoenix_html]
     ]
   end
 
