@@ -45,6 +45,7 @@ defmodule Scrivener.HTML do
     quote do
       import Scrivener.HTML
       import Scrivener.HTML.SEO
+      import Scrivener.Page
     end
   end
 
